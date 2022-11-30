@@ -1,0 +1,39 @@
+{
+    "markdown": {
+        "hardwrap": false,
+        "idInHeadings": true
+    },
+    "theme_opts": {
+        "homepageTitle": "XXX",
+        "menu": [
+            {
+              "title": "Website",
+              "link": "https://ankdev.me/clean-jsdoc-theme/dark/",
+              "target": "_blank",
+              "class": "some-class",
+              "id": "some-id"
+            },
+            {
+                "title": "Website",
+                "link": "https://ankdev.me/clean-jsdoc-theme/dark/",
+                "target": "_blank",
+                "class": "some-class",
+                "id": "some-id"
+            }
+        ]
+    },    
+    "source": {
+        "include": [
+        "src"
+        ],
+        "includePattern": ".+\\.js(doc)?$",
+        "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "opts": {
+        "template": "./node_modules/clean-jsdoc-theme",
+        "destination": "./docs/",
+        "theme_opts": {
+            "default_theme": "dark"
+        }
+    }
+}
