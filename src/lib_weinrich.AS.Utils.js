@@ -11,7 +11,7 @@ weinrich.as = {};
  * Allgemeine Funktionen
  * @memberof weinrich.as
  * @type {object}
- * @name weinrich.as.Utils
+ * @namespace weinrich.as.Utils
  */
  weinrich.as.Utils = {
     
@@ -757,7 +757,7 @@ weinrich.as = {};
  * Funktionen für Zeit und Datum
  * @memberof weinrich.as
  * @type {object}
- * @name weinrich.as.DateUtils
+ * @namespace weinrich.as.DateUtils
  */
 weinrich.as.DateUtils = {
 
@@ -889,7 +889,7 @@ weinrich.as.DateUtils = {
  * Funktionen auf Dateiebene
  * @memberof weinrich.as
  * @type {object}
- * @name weinrich.as.FileUtils
+ * @namespace weinrich.as.FileUtils
  */
 weinrich.as.FileUtils = {
      
