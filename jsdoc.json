@@ -10,16 +10,12 @@
             {
               "title": "Website",
               "link": "https://ekweinrich.github.io/Weinrich-Library/",
-              "target": "_blank",
-              "class": "some-class",
-              "id": "some-id"
+              "id": "website"
             },
             {
-                "title": "Website",
-                "link": "https://ekweinrich.github.io/Weinrich-Library/",
-                "target": "_blank",
-                "class": "some-class",
-                "id": "some-id"
+                "title": "Google",
+                "link": "https://www.google.com/",
+                "id": "google"
             }
         ]
     },    
