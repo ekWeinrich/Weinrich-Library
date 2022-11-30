@@ -11,6 +11,7 @@ weinrich.as = {};
  * Allgemeine Funktionen
  * @memberof weinrich.as
  * @type {object}
+ * @version 1.0.0
  * @namespace weinrich.as.Utils
  */
  weinrich.as.Utils = {

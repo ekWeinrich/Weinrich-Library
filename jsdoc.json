@@ -4,20 +4,7 @@
         "idInHeadings": true
     },
     "theme_opts": {
-        "footer": "This is footer",
-        "homepageTitle": "XXX",
-        "menu": [
-            {
-              "title": "Website",
-              "link": "https://ekweinrich.github.io/Weinrich-Library/",
-              "id": "website"
-            },
-            {
-                "title": "Google",
-                "link": "https://www.google.com/",
-                "id": "google"
-            }
-        ]
+        
     },    
     "plugins": ["plugins/markdown"],
     "source": {
@@ -28,11 +15,24 @@
         "excludePattern": "(^|\\/|\\\\)_"
     },
     "opts": {
+        "encoding": "utf8",
         "template": "./node_modules/clean-jsdoc-theme",
         "destination": "./docs/",
+        "readme": "./README.md",
+        "recurse": true,
+        "verbose": true,
         "base_url": "https://ekweinrich.github.io/Weinrich-Library//",
         "theme_opts": {
-            "default_theme": "dark"
+            "default_theme": "dark",
+            "footer": "This is footer",
+            "homepageTitle": "XXX",
+            "menu": [
+                {
+                    "title": "Google",
+                    "link": "https://www.google.com/",
+                    "id": "google"
+                }
+            ]
         }
     }
 }
