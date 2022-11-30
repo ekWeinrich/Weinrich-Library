@@ -4,6 +4,7 @@
         "idInHeadings": true
     },
     "theme_opts": {
+        "footer": "This is footer",
         "homepageTitle": "XXX",
         "menu": [
             {
@@ -22,6 +23,7 @@
             }
         ]
     },    
+    "plugins": ["plugins/markdown"],
     "source": {
         "include": [
         "src"
