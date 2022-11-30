@@ -8,7 +8,7 @@ var weinrich = {};
 weinrich.as = {};
 
 /**
- * Allgemeine Funktionen
+ * Allgemeine Funktionen 1.0.0
  * @memberof weinrich.as
  * @type {object}
  * @version 1.0.0
