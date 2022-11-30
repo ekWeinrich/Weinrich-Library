@@ -5,18 +5,10 @@ importPackage(Packages.org.apache.commons.io);
 importPackage(Packages.de.elo.ix.client);
 
 var weinrich = {};
-
-/**
- * Funktionsbibliothek für AS-Regeln
- * @type {object}
- * @version 1.0.0
- * @namespace weinrich.as
- */
 weinrich.as = {};
 
 /**
  * Allgemeine Funktionen
- * @memberof weinrich.as
  * @namespace weinrich.as.Utils
  * @type {object}
  * @version 1.0.0
@@ -26,6 +18,7 @@ weinrich.as.Utils = {
     /**
     * Log-Konfiguration. Vor dem loggen immer mit initLogging zu initialisieren.
     * @author   Erik Köhler - Weinrich
+    * @memberof weinrich.as.Utils
     * @type     {object}
     * @property {bool}      initialized     True, wenn logConfig initialisiert wurde
     * @property {String}    asRuleName      Name der laufenden AS-Regel
