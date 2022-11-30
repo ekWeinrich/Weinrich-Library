@@ -5,20 +5,25 @@ importPackage(Packages.org.apache.commons.io);
 importPackage(Packages.de.elo.ix.client);
 
 var weinrich = {};
+
+/**
+ * Funktionsbibliothek für AS-Regeln
+ * @type {object}
+ * @version 1.0.0
+ * @namespace weinrich.as
+ */
 weinrich.as = {};
 
 /**
- * Allgemeine Funktionen 1.0.0
+ * Allgemeine Funktionen
  * @memberof weinrich.as
+ * @namespace weinrich.as.Utils
  * @type {object}
  * @version 1.0.0
- * @namespace weinrich.as.Utils
  */
- weinrich.as.Utils = {
-    
-    // # Members
+weinrich.as.Utils = {
 
-     /**
+    /**
     * Log-Konfiguration. Vor dem loggen immer mit initLogging zu initialisieren.
     * @author   Erik Köhler - Weinrich
     * @type     {object}
@@ -34,7 +39,6 @@ weinrich.as = {};
 
 
     // # -----------------------------------------------------
-    // # Methods
 
     /**
     * Initialisiert die Log-Konfiguration.
@@ -54,6 +58,8 @@ weinrich.as = {};
     /**
     * Loggt den übergebenen String. Nur mitloggen, wenn man im Debug-Modus ist oder eine hohe Priorität vorliegt.
     * @author   Erik Köhler - Weinrich
+    * @memberof weinrich.as.Utils
+    * @method   logging
     * @param    {bool}   highPriority   Hohe Priorität loggt immer
     * @param    {String} text           Zu loggender Text
     */  
@@ -889,14 +895,16 @@ weinrich.as.DateUtils = {
 /**
  * Funktionen auf Dateiebene
  * @memberof weinrich.as
- * @type {object}
  * @namespace weinrich.as.FileUtils
+ * @type {object}
  */
 weinrich.as.FileUtils = {
      
     /**
     * Prüft, ob der übergebene Pfad existiert.
     * @author   Erik Köhler - Weinrich
+    * @memberof weinrich.as.FileUtils
+    * @method   pathExists
     * @param    {File}   path   Pfad für die Datei/den Ordner, der zu prüfen ist
     * @return   {bool}          True wenn Pfad existiert
     */
@@ -908,6 +916,8 @@ weinrich.as.FileUtils = {
     /**
     * Prüft, ob der übergebene Pfad auf ein Verzeichnis verweist.
     * @author   Erik Köhler - Weinrich
+    * @memberof weinrich.as.FileUtils
+    * @method   isDirectory
     * @param    {File}   path   Pfad für die Datei/den Ordner, der zu prüfen ist
     * @return   {bool}          True wenn Verzeichnis
     */
@@ -919,6 +929,8 @@ weinrich.as.FileUtils = {
     /**
     * Prüft, ob der übergebene Pfad auf eine Datei verweist.
     * @author   Erik Köhler - Weinrich
+    * @memberof weinrich.as.FileUtils
+    * @method   isFile
     * @param    {File}   path   Pfad für die Datei/den Ordner, der zu prüfen ist
     * @return   {bool}          True wenn Datei
     */
@@ -930,6 +942,8 @@ weinrich.as.FileUtils = {
     /**
     * Kopiert eine Datei in den angegebenen Pfad.
     * @author   Erik Köhler - Weinrich
+    * @memberof weinrich.as.FileUtils
+    * @method   copyFileTo
     * @param    {File}   sourceFile     Pfad auf die zu kopierende Datei
     * @param    {File}   destFile       Pfad an die Stelle, wohin die Datei kopiert werden soll
     * @param    {bool}   overwrite      Überschreibe die Datei, falls der Pfad auf ein bereits existierendes File verweist
@@ -949,6 +963,8 @@ weinrich.as.FileUtils = {
     /**
     * Verschiebt eine Datei in den angegebenen Pfad.
     * @author   Erik Köhler - Weinrich
+    * @memberof weinrich.as.FileUtils
+    * @method   moveFileTo
     * @param    {File}   sourceFile     Pfad auf die zu verschiebende Datei
     * @param    {File}   destFile       Pfad an die Stelle, wohin die Datei verschoben werden soll
     * @param    {bool}   overwrite      Überschreibe die Datei, falls der Pfad auf ein bereits existierendes File verweist
