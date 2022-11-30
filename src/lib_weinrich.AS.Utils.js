@@ -9,6 +9,7 @@ weinrich.as = {};
 
 /**
  * Allgemeine Funktionen
+ * @memberof weinrich.as
  * @namespace weinrich.as.Utils
  * @type {object}
  * @version 1.0.0
@@ -756,8 +757,8 @@ weinrich.as.Utils = {
 /**
  * Funktionen für Zeit und Datum
  * @memberof weinrich.as
- * @type {object}
  * @namespace weinrich.as.DateUtils
+ * @type {object}
  */
 weinrich.as.DateUtils = {
 
