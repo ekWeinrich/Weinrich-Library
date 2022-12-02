@@ -5,18 +5,12 @@ importPackage(Packages.org.apache.commons.io);
 importPackage(Packages.de.elo.ix.client);
 
 var weinrich = {};
-
-/**
- * Allgemeine Funktionen
- * @module AS
- * @type {object}
- * @version 1.0.0
- */
 weinrich.as = {};
 
 /**
  * Allgemeine Funktionen
- * @memberof module:AS
+ * @memberof weinrich.as
+ * @namespace weinrich.as.Utils
  * @type {object}
  * @version 1.0.0
  */
@@ -25,7 +19,7 @@ weinrich.as.Utils = {
     /**
     * Log-Konfiguration. Vor dem loggen immer mit initLogging zu initialisieren.
     * @author   Erik Köhler - Weinrich
-    * @memberof module:AS.Utils
+    * @memberof weinrich.as.Utils
     * @type     {object}
     * @property {bool}      initialized     True, wenn logConfig initialisiert wurde
     * @property {String}    asRuleName      Name der laufenden AS-Regel
@@ -47,7 +41,8 @@ weinrich.as.Utils = {
     * @method   initLogging
     * @param    {bool}      debugMode      Log im Debug-Modus
     * @param    {String}    asRuleName     Name der AS-Regel
-    */   
+    */
+    // * Erfolgreich getestet
     initLogging: function (debugMode, asRuleName) {		
         
         this.logConfig["initialized"] = true;
@@ -63,6 +58,7 @@ weinrich.as.Utils = {
     * @param    {bool}   highPriority   Hohe Priorität loggt immer
     * @param    {String} text           Zu loggender Text
     */  
+    // * Erfolgreich getestet
     logging: function(highPriority, text) {		
         
         if (this.logConfig.initialized == true) {
@@ -85,17 +81,23 @@ weinrich.as.Utils = {
     /**
     * Importiert eine Datei in ELO.
     * @author   Erik Köhler - Weinrich
-    * @param    {File}      file       File dere zu importierenden Datei
+    * @param    {File}      file       File der zu importierenden Datei
     * @param    {int}       sordId     ObjId des Sords, in das die Datei importiert werden soll
     * @param    {String}    maskName   Name der Maske, welche die Datei in ELO bekommen soll
     * @param    {Object}    objKeysObj Indexfelder mit Werten, welche das Dokument bekommen soll. 
     *                                  Beispiel: {"ELOSTATUS":"Imported"}
     * @return   {bool}                 True wenn erfolgreich importiert
     */
+    // * Erfolgreich getestet
     importDocument: function (file, sordId, maskName, objKeysObj) {
                 
         try {           
             this.logging(false, "Import file: " + file.name);
+
+            if (this.fileOrDirectoryExists(file)) {
+                this.logging(false, "File not found: " + file.name);
+                return false;
+            }
             
             objKeysObj[DocMaskLineC.NAME_FILENAME] = file.name;
 
@@ -136,7 +138,8 @@ weinrich.as.Utils = {
     * @param    {File}   file   Pfad für die Datei/den Ordner, der zu prüfen ist
     * @return   {bool}          True wenn Datei bereits in ELO existiert
     */
-	hasDoublet: function (file) {
+    // * Erfolgreich getestet
+	doubletExists: function (file) {
 		
 		if (Packages.de.elo.mover.utils.ELOAsUtils.findDoublet(emConnect, file))			
 			return true;
@@ -150,6 +153,7 @@ weinrich.as.Utils = {
     * @param    {int}   sordId              ObjId des zu löschenden Sords
     * @param    {bool}  folderMustBeEmpty   Lösche nur einen Ordner, wenn dieser bereits leer ist
     * @return   {bool}                      True wenn Sord erfolgreich gelöscht wurde
+    * TODO Teste mich
     */
 	deleteSord: function(sordId, folderMustBeEmpty) {
 
@@ -188,6 +192,7 @@ weinrich.as.Utils = {
     * @param    {int}   sourceId            ObjId des zu verschiebenden Sords
     * @param    {int}   destId              ObjId des Verzeichnisses, in das das Sord verschoben werden soll
     * @return   {bool}                      True wenn Elternverzeichnis gelöscht wurde, weil es leer wurde
+    * TODO Teste mich
     */
     moveSordCleanUpAfter: function(sourceId, destId) {
 		
@@ -207,6 +212,7 @@ weinrich.as.Utils = {
     * @author   Erik Köhler - Weinrich
     * @param    {int}   sourceId            ObjId des zu löschenden Sords
     * @return   {bool}                      True wenn Elternverzeichnis gelöscht wurde, weil es leer wurde
+    * TODO Teste mich
     */
     deleteSordCleanUpAfter: function (sourceId) {
         
@@ -231,6 +237,7 @@ weinrich.as.Utils = {
     * @param    {String}                    filterValue            Wert, nach dem gefiltert wird
     * @param    {String}                    fieldToFilterWith      Wenn filterType=Indexfeld, erwartet Name des Indexfeldes
     * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
+    * TODO Teste mich
     */
     filterArrayListContains: function(sordArrList, filterType, filterValue, fieldToFilterWith) {
 
@@ -284,6 +291,7 @@ weinrich.as.Utils = {
     * @param    {String}    docname         Kurzbezeichnung, nach der gesucht werden soll
     * @param    {int}       numberOfResults Maximale Anzahl an Treffern, die gefunden werden können
     * @return   {Sord[]}                    Gibt die gefundenen Sords als Array zurück
+    * TODO Teste mich
     */
 	getSordsByDocName: function(maskname, docname, numberOfResults) {
 		var findInfo = new FindInfo();
@@ -325,6 +333,7 @@ weinrich.as.Utils = {
     * @param    {String}    indexfeldWert   Wert des Indexfeldes, nach dem gesucht werden soll
     * @param    {int}       numberOfResults Maximale Anzahl an Treffern, die gefunden werden können
     * @return   {Sord[]}                    Gibt die gefundenen Sords als Array zurück
+    * TODO Teste mich
     */
     getSordsByIndexfield: function(maskname, indexfeldName, indexfeldWert, numberOfResults) {
 		var findInfo = new FindInfo();
@@ -369,6 +378,7 @@ weinrich.as.Utils = {
     * @param    {int}       parentId    Verzeichnis, in dem nach der Kurzbezeichnung gesucht werden soll
     * @param    {String}    folderName  Kurzbezeichnung, welches gesucht werden soll
     * @return   {bool}                  True, wenn Kurzbezeichnung bereits in Verzeichnis existiert  
+    * TODO Teste mich
     */
 	checkFolderExistsInArchive: function(parentId, folderName) {
 		
@@ -392,6 +402,7 @@ weinrich.as.Utils = {
     * @param    {int}   sordId  ObjId des Sords, dessen Icon geändert werden soll
     * @param    {int}   iconId  Id des Icons, welches das Sord bekommen soll
     * @return   {bool}          True, wenn Icon erfolgreich geändert wurde
+    * TODO Teste mich
     */
 	setSordIcon: function(sordId, iconId) {
 		
@@ -422,6 +433,7 @@ weinrich.as.Utils = {
     * @param    {String}    maskLineKey     Name des Indexfeldes
     * @param    {int}       maskLineId      Id des Indexfeldes
     * @return   {bool}                      True, wenn Indexfeld erfolgreich beschrieben wurde
+    * TODO Teste mich
     */
     insertStringInIndexfield: function (sord, inputString, maskLineKey, maskLineId) {
 		try {
@@ -446,6 +458,7 @@ weinrich.as.Utils = {
     * @param    {Sord}  sord        Sord, für das die Farbe geändert werden soll
     * @param    {int}   colorId     Id des Icons, welches das Sord bekommen soll
     * @return   {bool}              True, wenn Farbe erfolgreich geändert wurde
+    * TODO Teste mich
     */
     setSordColor: function(sord, colorId) {
 		try {           
@@ -473,6 +486,7 @@ weinrich.as.Utils = {
     * @param    {String}    name    Name des Indexfeldes
     * @param    {String}    value   Wert des Indesfeldes
     * @return   {ObjKey}            Erstellter ObjKey
+    * TODO Teste mich
     */
 	createObjKey: function (id, name, value) {
         var objKey = new ObjKey();
@@ -488,6 +502,7 @@ weinrich.as.Utils = {
     * @param    {int}       sordId  ObjId des Sords, für das ein Feed-Eintrag geschrieben werden soll
     * @param    {String}    text    Text des Feed-Eintrags
     * @return   {bool}              True, wenn Feed-Eintrag erfolgreich geschrieben wurde
+    * TODO Teste mich
     */
 	createFeedEntry: function(sordId, text) {
         try {
@@ -507,6 +522,7 @@ weinrich.as.Utils = {
     * @param    {String}    mapName     Name des zu setzenden Mapfeldes
     * @param    {String}    mapValue    Wert, welcher in das Mapfeld geschrieben werden soll
     * @return   {bool}                  True, wenn Mapfeld erfolgreich gesetzt wurde
+    * TODO Teste mich
     */
     setMapValue: function (sordId, mapName, mapValue) {
         
@@ -526,6 +542,7 @@ weinrich.as.Utils = {
     * @param    {int}       sordId      ObjId des Sords, für das das Mapfeld geladen werden soll
     * @param    {String}    mapName     Name des zu ladenden Mapfeldes
     * @return   {String[]}              Wert des Indexfeldes, bei Fehler undefined
+    * TODO Teste mich
     */
     getMapValues: function (sordId, mapName) {
         
@@ -544,6 +561,7 @@ weinrich.as.Utils = {
     * @param    {Sord}      sord       Sord, aus dem der Wert des Indexfelds geladen werden soll
     * @param    {int}       objKeyId   ObjKeyId des Indexfeldes
     * @return   {String[]}             Wert des Indexfeldes, bei Fehler undefined
+    * TODO Teste mich
     */
     getIndexfieldValue: function (sord, objKeyId) {
         
@@ -562,6 +580,7 @@ weinrich.as.Utils = {
     * @param    {Sord}      sord                Sord, aus dem der Wert des Indexfelds geladen werden soll
     * @param    {String}    objKeyGroupName     Name des Indexfeldes
     * @return   {String[]}                      Wert des Indexfeldes, bei Fehler undefined
+    * TODO Teste mich
     */
     getIndexfieldValue: function (sord, objKeyGroupName) {
         try {
@@ -580,6 +599,7 @@ weinrich.as.Utils = {
     * @param    {String}    objKeyId    ObjKeyId des Indexfeldes
     * @param    {String}    data        Wert, der in das Indexfeld geschrieben werden soll
     * @return   {bool}                  True, wenn Indexfeld erfolgreich gesetzt wurde
+    * TODO Teste mich
     */
     setIndexfieldValue: function (sord, objKeyId, data) {
         
@@ -600,6 +620,7 @@ weinrich.as.Utils = {
     * @param    {String}    objKeyGroupName     Name des Indexfeldes
     * @param    {String}    data                Wert, der in das Indexfeld geschrieben werden soll
     * @return   {bool}                          True, wenn Indexfeld erfolgreich gesetzt wurde
+    * TODO Teste mich
     */
     setIndexfieldValue: function (sord, objKeyGroupName, data) {
         
@@ -618,6 +639,7 @@ weinrich.as.Utils = {
     * @author   Erik Köhler - Weinrich
     * @param    {int}                           parentId    Eltern-Sord für das alle Kind-Sords geladen werden sollen
     * @return   {java.util.ArrayList<Sord>}                 Alle Kind-Sords des Eltern-Sords
+    * TODO Teste mich
     */
     getChildren: function (parentId) {	
         
@@ -635,6 +657,7 @@ weinrich.as.Utils = {
     * @author   Erik Köhler - Weinrich
     * @param    {int}                           parentId    Sord, für das die Unterverzeichnisse geladen werden sollen
     * @return   {java.util.ArrayList<Sord>}                 Alle Unterverzeichnisse des Sords
+    * TODO Teste mich
     */
     getSubFolders: function (parentId) {		
         
@@ -652,6 +675,7 @@ weinrich.as.Utils = {
     * @author   Erik Köhler - Weinrich
     * @param    {int}        sordId     Sord, für das der ELO-Pfad bestimmt werden soll
     * @return   {String}                ELO-Pfad des Sords
+    * TODO Teste mich
     */
     getElementPath: function (sordId) {	
         try {
@@ -668,8 +692,8 @@ weinrich.as.Utils = {
     * @author   Erik Köhler - Weinrich
     * @param    {String}    path    Vollständiger Pfad des zu ladenden Sords
     * @return   {Sord}              Sord, der über den Pfad geladen wurde
-    */
-	// 
+    * TODO Teste mich
+    */ 
     getElemByArcpath: function (path) {		
         try {
             return Packages.de.elo.mover.utils.ELOAsUtils.getElemByArcpath(emConnect, path);	
@@ -685,6 +709,7 @@ weinrich.as.Utils = {
     * @author   Erik Köhler - Weinrich
     * @param    {String}    path    Vollständiger Pfad des zu ladenden Sords
     * @return   {Sord}              Sord, der über den  relativen Arc-Pfad geladen wurde
+    * TODO Teste mich
     */
     getElemByArcpath: function (path, rootId) {		
         try {
@@ -702,6 +727,7 @@ weinrich.as.Utils = {
     * @author   Erik Köhler - Weinrich
     * @param    {String}    path    Vollständiger Pfad des zu ladenden Sords
     * @return   {int}               ObjId des neu angelegten Verzeichnisses
+    * TODO Teste mich
     */
     createArcPath: function(eloPath) {
 		
@@ -724,6 +750,7 @@ weinrich.as.Utils = {
     * @param    {String}    folderName  Name des neuen Verzeichnisses
     * @param    {String}    maskName    Name der Maske für das neue Verzeichnis
     * @return   {int}                   ObjId des neu angelegten Verzeichnisses
+    * TODO Teste mich
     */
     addNewFolder: function (parentId, folderName, maskName) {		
         
@@ -741,6 +768,7 @@ weinrich.as.Utils = {
     * @author   Erik Köhler - Weinrich
     * @param    {int}    sordId     ObjId, des zu prüfenden Sords
     * @return   {bool}              True, wenn Sord eine Referenz ist. Bei Fehler gebe -1 zurück
+    * TODO Teste mich
     */
     isReference: function (sordId) {
         
@@ -772,6 +800,7 @@ weinrich.as.DateUtils = {
     * Gibt das aktuelle DateTime ohne Zeit zurück 
     * @author   Erik Köhler - Weinrich
     * @return   {Date}  Gibt das aktuelle Datum ohne Uhrzeit zurück. Bei Fehler undefinded
+    * TODO Teste mich
     */
     getCurrentDate: function () {	
         try {    
@@ -787,6 +816,7 @@ weinrich.as.DateUtils = {
     * Gibt das heutige DateTime plus x Minuten zurück. Wähle negativen Wert bei minutes für minus x Tage
     * @author   Erik Köhler - Weinrich
     * @return   {Date}  Um x Minuten verschobene Uhrzeit
+    * TODO Teste mich
     */
     getDateTimeMinutesLater: function(minutes) {		
         var cal = Calendar.getInstance(); 
@@ -798,6 +828,7 @@ weinrich.as.DateUtils = {
     * Gibt das heutige DateTime plus x Stunden zurück. Wähle negativen Wert bei hours für minus x Stunden
     * @author   Erik Köhler - Weinrich
     * @return   {Date}  Um x Stunden verschobene Uhrzeit
+    * TODO Teste mich
     */
     getDateTimeHoursLater: function(hours) {		
         var cal = Calendar.getInstance(); 
@@ -809,6 +840,7 @@ weinrich.as.DateUtils = {
     * Gibt das heutige DateTime plus x Tage zurück. Wähle negativen Wert bei days für minus x Tage
     * @author   Erik Köhler - Weinrich
     * @return   {Date}  Um x Minuten verschobene Uhrzeit
+    * TODO Teste mich
     */
     getDateTimeDaysLater: function(days) {		
         var cal = Calendar.getInstance(); 
@@ -820,6 +852,7 @@ weinrich.as.DateUtils = {
     * Gibt das heutige DateTime plus x Monate zurück. Wähle negativen Wert bei months für minus x Monate
     * @author   Erik Köhler - Weinrich
     * @return   {Date}  Um x Monate verschobene Uhrzeit
+    * TODO Teste mich
     */
     getDateTimeMonthsLater: function(months) {		
         var cal = Calendar.getInstance(); 
@@ -831,6 +864,7 @@ weinrich.as.DateUtils = {
     * Gibt das heutige DateTime plus x Jahre zurück. Wähle negativen Wert bei years für minus x Jahre
     * @author   Erik Köhler - Weinrich
     * @return   {Date}  Um x Jahre verschobene Uhrzeit
+    * TODO Teste mich
     */
     getDateTimeYearsLater: function(years) {		
         var cal = Calendar.getInstance(); 
@@ -842,6 +876,7 @@ weinrich.as.DateUtils = {
     * Gibt zurück, ob das erste Datum nach dem zweiten Datum liegt
     * @author   Erik Köhler - Weinrich
     * @return   {bool}  True, wenn erstes Datum nach dem zweiten Datum. Bsp.: 01.01.2000 > 01.01.1990 => true
+    * TODO Teste mich
     */
     dateIsLater: function (firstDate, secondDate) {	
         try {
@@ -858,6 +893,7 @@ weinrich.as.DateUtils = {
     * @author   Erik Köhler - Weinrich
     * @param    {String}    month   Ausgeschriebener Monat. Beispiel: "Februar"
     * @return   {String}            Monatsnummer als String. Beispiel: "Januar" -> "01"  
+    * TODO Teste mich
     */
 	changeMonthToMonthNumber: function (month) {
 		var monthNumber = "";
@@ -893,7 +929,8 @@ weinrich.as.DateUtils = {
 };
 
 /**
- * Funktionen auf Dateiebene
+ * Funktionen auf Dateiebene. Nutzt u.a. Funktionen von 
+ * {@link https://commons.apache.org/proper/commons-io/apidocs/org/apache/commons/io/FileUtils.html FileUtils}
  * @memberof weinrich.as
  * @namespace weinrich.as.FileUtils
  * @type {object}
@@ -904,13 +941,14 @@ weinrich.as.FileUtils = {
     * Prüft, ob der übergebene Pfad existiert.
     * @author   Erik Köhler - Weinrich
     * @memberof weinrich.as.FileUtils
-    * @method   pathExists
-    * @param    {File}   path   Pfad für die Datei/den Ordner, der zu prüfen ist
+    * @method   fileOrDirectoryExists
+    * @param    {File}   file   Pfad für die Datei/den Ordner, der zu prüfen ist
     * @return   {bool}          True wenn Pfad existiert
     */
-    pathExists: function (path) {
+    // * Erfolgreich getestet
+    fileOrDirectoryExists: function (file) {
             
-        return path.exists();
+        return file.exists();
     },
         
     /**
@@ -918,12 +956,13 @@ weinrich.as.FileUtils = {
     * @author   Erik Köhler - Weinrich
     * @memberof weinrich.as.FileUtils
     * @method   isDirectory
-    * @param    {File}   path   Pfad für die Datei/den Ordner, der zu prüfen ist
+    * @param    {File}   file   Pfad für die Datei/den Ordner, der zu prüfen ist
     * @return   {bool}          True wenn Verzeichnis
     */
-    isDirectory: function (path) {
+    // * Erfolgreich getestet
+    isDirectory: function (file) {
         
-        return path.isDirectory();
+        return file.isDirectory();
     },
 
     /**
@@ -931,27 +970,41 @@ weinrich.as.FileUtils = {
     * @author   Erik Köhler - Weinrich
     * @memberof weinrich.as.FileUtils
     * @method   isFile
-    * @param    {File}   path   Pfad für die Datei/den Ordner, der zu prüfen ist
+    * @param    {File}   file   Pfad für die Datei/den Ordner, der zu prüfen ist
     * @return   {bool}          True wenn Datei
     */
-    isFile: function (path) {
+    // * Erfolgreich getestet
+    isFile: function (file) {
         
-        return !path.isDirectory();
+        return !file.isDirectory();
     },
 
     /**
     * Kopiert eine Datei in den angegebenen Pfad.
     * @author   Erik Köhler - Weinrich
     * @memberof weinrich.as.FileUtils
-    * @method   copyFileTo
-    * @param    {File}   sourceFile     Pfad auf die zu kopierende Datei
-    * @param    {File}   destFile       Pfad an die Stelle, wohin die Datei kopiert werden soll
+    * @method   copyFileToDir
+    * @param    {File}   srcFile        Pfad auf die zu kopierende Datei
+    * @param    {File}   destDir        Verzeichnis in das die Datei kopiert werden soll
     * @param    {bool}   overwrite      Überschreibe die Datei, falls der Pfad auf ein bereits existierendes File verweist
     * @return   {bool}                  True wenn erfolgreich kopiert
+    * TODO Teste mich
     */
-    copyFileTo: function (sourceFile, destFile, overwrite) {        
+    copyFileToDir: function (srcFile, destDir, overwrite) {        
         try {
-            org.apache.commons.io.FileUtils.copyFile(sourceFile, destFile, overwrite);
+
+            if (!this.fileOrDirectoryExists(srcFile)) {
+                weinrich.as.Utils.logging(true, "Fehler beim Kopieren der Datei. Datei nicht gefunden.");
+                return false;
+            }
+                
+            if (overwrite) {
+                // FileUtils.deleteQuietly(new File(destDir.getPath() + "\\" + srcFile.getName()));
+                FileUtils.delete(new File(destDir.getPath() + "\\" + srcFile.getName()));
+            }
+
+            FileUtils.copyFileToDirectory(srcFile, destDir);
+
             return true;
         }
         catch (ex) {
@@ -964,18 +1017,35 @@ weinrich.as.FileUtils = {
     * Verschiebt eine Datei in den angegebenen Pfad.
     * @author   Erik Köhler - Weinrich
     * @memberof weinrich.as.FileUtils
-    * @method   moveFileTo
-    * @param    {File}   sourceFile     Pfad auf die zu verschiebende Datei
-    * @param    {File}   destFile       Pfad an die Stelle, wohin die Datei verschoben werden soll
+    * @method   moveFileToDir
+    * @param    {File}   srcFile        Pfad auf die zu verschiebende Datei
+    * @param    {File}   destDir        Verzeichnis in das die Datei verschoben werden soll
     * @param    {bool}   overwrite      Überschreibe die Datei, falls der Pfad auf ein bereits existierendes File verweist
     * @return   {bool}                  True wenn erfolgreich verschoben
+    * @description
+    * <code>
+    * var srcFile = new File("C:\\temp\\tmp\\tmp.pdf");
+    * var destDir = new File("C:\\temp\\");
+    * weinrich.as.FileUtils.moveFileToDir(srcFile, destDir, true);
+    * </code>
+    * TODO Teste mich
     */
-    moveFileTo: function (sourceFile, destFile, overwrite) {        
+    moveFileToDir: function (srcFile, destDir, overwrite) {        
         try {
-            if (overwrite) {
-                org.apache.commons.io.deleteQuietly(destFile);
+
+            if (!this.fileOrDirectoryExists(srcFile)) {
+                weinrich.as.Utils.logging(true, "Fehler beim Verschieben der Datei. Datei nicht gefunden.");
+                return false;
             }
-            org.apache.commons.io.FileUtils.moveFile(sourceFile, destinationFilePath);
+
+            if (overwrite) {
+                // FileUtils.deleteQuietly(new File(destDir.getPath() + "\\" + srcFile.getName()));
+                FileUtils.delete(new File(destDir.getPath() + "\\" + srcFile.getName()));
+            }
+
+            //Legt Verzeichnis an, falls es nicht existiert
+            FileUtils.moveToDirectory(srcFile, destDir, true);
+
             return true;
         }
         catch(ex) {
