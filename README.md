@@ -19,6 +19,13 @@ Und natürlich die Bibliothek selber:
 
 - <a href="https://ekweinrich.github.io/Weinrich-Library/lib_weinrich.as.js.html">lib_weinrich.as</a>
 
+Um zu loggen:
+
+//Init log (nur 1 mal am Anfang)
+weinrich.as.Utils.initLogging(true, "TestRule");
+//eigentliches loggen
+weinrich.as.Utils.logging(false, "TEST-LOG");
+
 
 
 Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="https://github.com/ekWeinrich/Weinrich-Library/issues">hier</a> 
