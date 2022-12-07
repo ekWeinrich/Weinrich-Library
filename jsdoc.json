@@ -24,8 +24,8 @@
         "base_url": "https://ekweinrich.github.io/Weinrich-Library//",
         "theme_opts": {
             "default_theme": "dark",
-            "footer": "This is footer",
-            "homepageTitle": "XXX",
+            "footer": "This is a footer",
+            "homepageTitle": "ELO Library - Weinrich",
             "menu": [
                 {
                     "title": "Google",
