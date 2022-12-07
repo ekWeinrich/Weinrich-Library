@@ -17,7 +17,7 @@ Damit die Bibliothek lauffähig ist, müssen folgende ELO-Bibliotheken included 
 
 Und natürlich die Bibliothek selber:
 
-- <a href="https://ekweinrich.github.io/Weinrich-Library/lib_weinrich.as.js.html" download="lib_weinrich.as.js">lib_weinrich.as</a>
+- <a href="https://ekweinrich.github.io/Weinrich-Library/lib_weinrich.as.js.html">lib_weinrich.as</a>
 
 
 
