@@ -42,7 +42,6 @@ weinrich.as.Utils = {
     * @param    {bool}      debugMode      Log im Debug-Modus
     * @param    {String}    asRuleName     Name der AS-Regel
     */
-    // * Erfolgreich getestet
     initLogging: function (debugMode, asRuleName) {		
         
         this.logConfig["initialized"] = true;
@@ -57,8 +56,7 @@ weinrich.as.Utils = {
     * @method   logging
     * @param    {bool}   highPriority   Hohe Priorität loggt immer
     * @param    {String} text           Zu loggender Text
-    */  
-    // * Erfolgreich getestet
+    */
     logging: function(highPriority, text) {		
         
         if (this.logConfig.initialized == true) {
@@ -84,11 +82,15 @@ weinrich.as.Utils = {
     * @param    {File}      file       File der zu importierenden Datei
     * @param    {int}       sordId     ObjId des Sords, in das die Datei importiert werden soll
     * @param    {String}    maskName   Name der Maske, welche die Datei in ELO bekommen soll
-    * @param    {Object}    objKeysObj Indexfelder mit Werten, welche das Dokument bekommen soll. 
-    *                                  Beispiel: {"ELOSTATUS":"Imported"}
+    * @param    {Object}    objKeysObj Indexfelder mit Werten, welche das Dokument bekommen soll
     * @return   {bool}                 True wenn erfolgreich importiert
+    * @example
+    * var file = new File("C:\\temp\\tmp\\tmp1.pdf");
+    * var sordId = 10186;
+    * var maskId = "Freie Eingabe";
+    * var objKeys = { "ELOSTATUS": "Imported" };
+    * weinrich.as.Utils.importDocument(file, sordId, maskId, objKeys);
     */
-    // * Erfolgreich getestet
     importDocument: function (file, sordId, maskName, objKeysObj) {
                 
         try {           
@@ -138,7 +140,6 @@ weinrich.as.Utils = {
     * @param    {File}   file   Pfad für die Datei/den Ordner, der zu prüfen ist
     * @return   {bool}          True wenn Datei bereits in ELO existiert
     */
-    // * Erfolgreich getestet
 	doubletExists: function (file) {
 		
 		if (Packages.de.elo.mover.utils.ELOAsUtils.findDoublet(emConnect, file))			
@@ -153,7 +154,10 @@ weinrich.as.Utils = {
     * @param    {int}   sordId              ObjId des zu löschenden Sords
     * @param    {bool}  folderMustBeEmpty   Lösche nur einen Ordner, wenn dieser bereits leer ist
     * @return   {bool}                      True wenn Sord erfolgreich gelöscht wurde
-    * TODO Teste mich
+    * @example
+    * var sordId = 51970;
+    * var folderMustBeEmpty = true;        
+    * weinrich.as.Utils.deleteSord(sordId, folderMustBeEmpty);
     */
 	deleteSord: function(sordId, folderMustBeEmpty) {
 
@@ -189,15 +193,18 @@ weinrich.as.Utils = {
     /**
     * Verschiebt das Sord in das neue Verzeichnis in ELO. Wurde das Verzeichnis dadurch komplett geleert, lösche es.
     * @author   Erik Köhler - Weinrich
-    * @param    {int}   sourceId            ObjId des zu verschiebenden Sords
-    * @param    {int}   destId              ObjId des Verzeichnisses, in das das Sord verschoben werden soll
-    * @return   {bool}                      True wenn Elternverzeichnis gelöscht wurde, weil es leer wurde
-    * TODO Teste mich
+    * @param    {int}   srcId       ObjId des zu verschiebenden Sords
+    * @param    {int}   destId      ObjId des Verzeichnisses, in das das Sord verschoben werden soll
+    * @return   {bool}              True wenn Elternverzeichnis gelöscht wurde, weil es leer wurde
+    * @example
+    * var sordId = 10144;
+    * var destId = 8713;                
+    * weinrich.as.Utils.moveSordCleanUpAfter(sordId, destId);
     */
-    moveSordCleanUpAfter: function(sourceId, destId) {
+    moveSordCleanUpAfter: function(srcId, destId) {
 		
         //Lade Sord über ObjId
-        var sourceSord = ixConnect.ix().checkoutSord(sourceId, EditInfoC.mbAll, LockC.NO).sord;
+        var sourceSord = ixConnect.ix().checkoutSord(srcId, EditInfoC.mbAll, LockC.NO).sord;
         ixConnect.ix().checkinSord(sourceSord, SordC.mbAll, LockC.NO);
         
 		//Verschiebe das Dokument in das passende Verzeichnis
@@ -210,18 +217,20 @@ weinrich.as.Utils = {
     /**
     * Löscht das Sord in ELO. Wurde das Eltern-Verzeichnis dadurch komplett geleert, lösche es.
     * @author   Erik Köhler - Weinrich
-    * @param    {int}   sourceId            ObjId des zu löschenden Sords
-    * @return   {bool}                      True wenn Elternverzeichnis gelöscht wurde, weil es leer wurde
-    * TODO Teste mich
+    * @param    {int}   srcId       ObjId des zu löschenden Sords
+    * @return   {bool}              True wenn Elternverzeichnis gelöscht wurde, weil es leer wurde
+    * @example
+    * var sordId = 10144;          
+    * weinrich.as.Utils.deleteSordCleanUpAfter(sordId, destId);
     */
-    deleteSordCleanUpAfter: function (sourceId) {
+    deleteSordCleanUpAfter: function (srcId) {
         
 		//Lade Sord über ObjId
-        var sourceSord = ixConnect.ix().checkoutSord(sourceId, EditInfoC.mbAll, LockC.NO).sord;
+        var sourceSord = ixConnect.ix().checkoutSord(srcId, EditInfoC.mbAll, LockC.NO).sord;
         ixConnect.ix().checkinSord(sourceSord, SordC.mbAll, LockC.NO);
 
 		//Lösche Sord
-        this.deleteSord(sourceSord.id, true);
+        this.deleteSord(sourceSord.id, false);
 
         //Lösche Eltern-Sord, wenn dieses nach dem Löschen leer wurde
         return this.deleteSord(sourceSord.parentId, true);
@@ -285,13 +294,17 @@ weinrich.as.Utils = {
     },
 
     /**
-    * Suche nach Dokumenten über die Kurzbezeichnung.
+    * Suche nach Dokumenten über die Kurzbezeichnung. Über die Maske einschränkbar.
     * @author   Erik Köhler - Weinrich
     * @param    {String}    maskname        Name der Maske, falls danach gefiltert werden soll. Ansonsten ""
     * @param    {String}    docname         Kurzbezeichnung, nach der gesucht werden soll
     * @param    {int}       numberOfResults Maximale Anzahl an Treffern, die gefunden werden können
     * @return   {Sord[]}                    Gibt die gefundenen Sords als Array zurück
-    * TODO Teste mich
+    * @example
+    * var maskname = "Freie Eingabe";
+    * var docname = "Dokument";
+    * var numberOfResults = 100;       
+    * var sords = weinrich.as.Utils.getSordsByDocName(maskname, docname, numberOfResults);
     */
 	getSordsByDocName: function(maskname, docname, numberOfResults) {
 		var findInfo = new FindInfo();
@@ -333,7 +346,12 @@ weinrich.as.Utils = {
     * @param    {String}    indexfeldWert   Wert des Indexfeldes, nach dem gesucht werden soll
     * @param    {int}       numberOfResults Maximale Anzahl an Treffern, die gefunden werden können
     * @return   {Sord[]}                    Gibt die gefundenen Sords als Array zurück
-    * TODO Teste mich
+    * @example
+    * var maskname = "MASKE";
+    * var indexfeldName = "BETRIEB";
+    * var indexfeldWert = "Weinrich";
+    * var numberOfResults = 100;       
+    * var sords = weinrich.as.Utils.getSordsByIndexfield(maskname, indexfeldName, indexfeldWert, numberOfResults);
     */
     getSordsByIndexfield: function(maskname, indexfeldName, indexfeldWert, numberOfResults) {
 		var findInfo = new FindInfo();
@@ -373,18 +391,23 @@ weinrich.as.Utils = {
     },
 
     /**
-    * Prüfe, ob Verzeichnis in ELO existiert
+    * Prüfe in ELO, ob in einem Verzeichnis ein Ordner mit der Kurzbezeichnung existiert
     * @author   Erik Köhler - Weinrich
-    * @param    {int}       parentId    Verzeichnis, in dem nach der Kurzbezeichnung gesucht werden soll
-    * @param    {String}    folderName  Kurzbezeichnung, welches gesucht werden soll
-    * @return   {bool}                  True, wenn Kurzbezeichnung bereits in Verzeichnis existiert  
-    * TODO Teste mich
+    * @param    {int}       parentId    ObjId des Verzeichnisses, in dem nach der Kurzbezeichnung gesucht werden soll
+    * @param    {String}    folderName  Kurzbezeichnung, welche gesucht werden soll
+    * @return   {bool}                  True, wenn Kurzbezeichnung bereits in Verzeichnis existiert  nen
+    * @return   {Sord[]}                Gibt die gefundenen Sords als Array zurück
+    * @example
+    * var parentId = 12345;
+    * var folderName = "Personalakten";
+    * var folderExists = weinrich.as.Utils.checkFolderExistsInArchive(parentId, folderName);
     */
 	checkFolderExistsInArchive: function(parentId, folderName) {
 		
 		//Lade das Elterverzeichnis
 		var sords = Packages.de.elo.mover.utils.ELOAsUtils.getSubFolders(emConnect, parentId);
 				
+        //Gehe alle Unterordner durch und suche nach der Kurzbezeichnung
 		for(var i = 0; i < sords.length; i++) {
 			var sord = sords[i];
 			
@@ -397,7 +420,7 @@ weinrich.as.Utils = {
 	},
 
     /**
-    * ändert das Icon eines Sords
+    * Ändert das Icon eines Sords
     * @author   Erik Köhler - Weinrich
     * @param    {int}   sordId  ObjId des Sords, dessen Icon geändert werden soll
     * @param    {int}   iconId  Id des Icons, welches das Sord bekommen soll
@@ -413,11 +436,13 @@ weinrich.as.Utils = {
             if (sord.type != iconId) {
 
                 sord.type = iconId;
-                ixConnect.ix().checkinSord(sord, sordZ, LockC.NO);
                 
                 this.logging(false, "Icon des Ordners  " + sordId + " geändert auf Eintragstyp mit der ID " + iconId);
-                return true;
             }
+
+            ixConnect.ix().checkinSord(sord, sordZ, LockC.NO);
+
+            return true;
         }
         catch (ex) {
             this.logging(true, "Fehler beim Ändern des Icons für " + sordId);
@@ -929,7 +954,7 @@ weinrich.as.DateUtils = {
 };
 
 /**
- * Funktionen auf Dateiebene. Nutzt u.a. Funktionen von 
+ * Funktionen auf Dateiebene. Nutzt u.a. Funktionen von:  
  * {@link https://commons.apache.org/proper/commons-io/apidocs/org/apache/commons/io/FileUtils.html FileUtils}
  * @memberof weinrich.as
  * @namespace weinrich.as.FileUtils
@@ -938,14 +963,13 @@ weinrich.as.DateUtils = {
 weinrich.as.FileUtils = {
      
     /**
-    * Prüft, ob der übergebene Pfad existiert.
+    * Prüft, ob die Datei bzw. das Verzeichnis existiert.
     * @author   Erik Köhler - Weinrich
     * @memberof weinrich.as.FileUtils
     * @method   fileOrDirectoryExists
     * @param    {File}   file   Pfad für die Datei/den Ordner, der zu prüfen ist
     * @return   {bool}          True wenn Pfad existiert
     */
-    // * Erfolgreich getestet
     fileOrDirectoryExists: function (file) {
             
         return file.exists();
@@ -959,7 +983,6 @@ weinrich.as.FileUtils = {
     * @param    {File}   file   Pfad für die Datei/den Ordner, der zu prüfen ist
     * @return   {bool}          True wenn Verzeichnis
     */
-    // * Erfolgreich getestet
     isDirectory: function (file) {
         
         return file.isDirectory();
@@ -973,7 +996,6 @@ weinrich.as.FileUtils = {
     * @param    {File}   file   Pfad für die Datei/den Ordner, der zu prüfen ist
     * @return   {bool}          True wenn Datei
     */
-    // * Erfolgreich getestet
     isFile: function (file) {
         
         return !file.isDirectory();
@@ -988,7 +1010,11 @@ weinrich.as.FileUtils = {
     * @param    {File}   destDir        Verzeichnis in das die Datei kopiert werden soll
     * @param    {bool}   overwrite      Überschreibe die Datei, falls der Pfad auf ein bereits existierendes File verweist
     * @return   {bool}                  True wenn erfolgreich kopiert
-    * TODO Teste mich
+    * @example
+    * var srcFile = new File("C:\\temp\\tmp\\tmp.pdf");
+    * var destDir = new File("C:\\temp\\");
+    * var overwrite = true;
+    * weinrich.as.FileUtils.copyFileToDir(srcFile, destDir, overwrite);
     */
     copyFileToDir: function (srcFile, destDir, overwrite) {        
         try {
@@ -999,8 +1025,7 @@ weinrich.as.FileUtils = {
             }
                 
             if (overwrite) {
-                // FileUtils.deleteQuietly(new File(destDir.getPath() + "\\" + srcFile.getName()));
-                FileUtils.delete(new File(destDir.getPath() + "\\" + srcFile.getName()));
+                FileUtils.deleteQuietly(new File(destDir.getPath() + "\\" + srcFile.getName()));
             }
 
             FileUtils.copyFileToDirectory(srcFile, destDir);
@@ -1022,13 +1047,11 @@ weinrich.as.FileUtils = {
     * @param    {File}   destDir        Verzeichnis in das die Datei verschoben werden soll
     * @param    {bool}   overwrite      Überschreibe die Datei, falls der Pfad auf ein bereits existierendes File verweist
     * @return   {bool}                  True wenn erfolgreich verschoben
-    * @description
-    * <code>
+    * @example
     * var srcFile = new File("C:\\temp\\tmp\\tmp.pdf");
     * var destDir = new File("C:\\temp\\");
-    * weinrich.as.FileUtils.moveFileToDir(srcFile, destDir, true);
-    * </code>
-    * TODO Teste mich
+    * var overwrite = true;
+    * weinrich.as.FileUtils.moveFileToDir(srcFile, destDir, overwrite);
     */
     moveFileToDir: function (srcFile, destDir, overwrite) {        
         try {
@@ -1039,8 +1062,7 @@ weinrich.as.FileUtils = {
             }
 
             if (overwrite) {
-                // FileUtils.deleteQuietly(new File(destDir.getPath() + "\\" + srcFile.getName()));
-                FileUtils.delete(new File(destDir.getPath() + "\\" + srcFile.getName()));
+                FileUtils.deleteQuietly(new File(destDir.getPath() + "\\" + srcFile.getName()));
             }
 
             //Legt Verzeichnis an, falls es nicht existiert
