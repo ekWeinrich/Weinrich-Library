@@ -420,12 +420,15 @@ weinrich.as.Utils = {
 	},
 
     /**
-    * Ändert das Icon eines Sords
+    * Ändert das Icon eines Sords. Die IDs der Icons findet man in der Adminkonsole unter Eintragstypen.
     * @author   Erik Köhler - Weinrich
     * @param    {int}   sordId  ObjId des Sords, dessen Icon geändert werden soll
-    * @param    {int}   iconId  Id des Icons, welches das Sord bekommen soll
+    * @param    {int}   iconId  ID des Icons, welches das Sord bekommen soll
     * @return   {bool}          True, wenn Icon erfolgreich geändert wurde
-    * TODO Teste mich
+    * @example
+    * var sordId = 12345;
+    * var iconId = 22;
+    * weinrich.as.Utils.setSordIcon(sordId, iconId);
     */
 	setSordIcon: function(sordId, iconId) {
 		
@@ -445,7 +448,7 @@ weinrich.as.Utils = {
             return true;
         }
         catch (ex) {
-            this.logging(true, "Fehler beim Ändern des Icons für " + sordId);
+            this.logging(true, "Fehler beim Ändern des Icons für " + sordId + ".\n" + ex);
             return false;
         }		
 	},
@@ -453,18 +456,23 @@ weinrich.as.Utils = {
     /**
     * Fügt einen Wert in ein Indexfeld ein, auch wenn noch kein Wert dafür in der DB steht.
     * @author   Erik Köhler - Weinrich
-    * @param    {Sord}      sord            Sord, für das das Indexfeld beschrieben werden soll
+    * @param    {int}       sordId          SordId des Sords dessen Indexfeld beschrieben werden soll
     * @param    {String}    inputString     String, welcher in das Indexfeld geschrieben wird
     * @param    {String}    maskLineKey     Name des Indexfeldes
-    * @param    {int}       maskLineId      Id des Indexfeldes
+    * @param    {int}       maskLineId      Id des Indexfeldes. Siehe in der Maske nach z.B. "... (L3)" -> übergebe dann 3. 
     * @return   {bool}                      True, wenn Indexfeld erfolgreich beschrieben wurde
-    * TODO Teste mich
+    * @example
+    * var sordId = 43544;
+    * var inputString = "String to insert";
+    * var maskLineKey = "CONTRACT_NAME";
+    * var maskLineId = 5;
+    * weinrich.as.Utils.insertStringInIndexfield(sordId, inputString, maskLineKey, maskLineId);
     */
-    insertStringInIndexfield: function (sord, inputString, maskLineKey, maskLineId) {
-		try {
-			var tempSord = ixConnect.ix().checkoutSord(sord.id, EditInfoC.mbAll, LockC.NO).sord;
+    insertStringInIndexfield: function (sordId, inputString, maskLineKey, maskLineId) {
+        try {
+			var tempSord = ixConnect.ix().checkoutSord(sordId, EditInfoC.mbAll, LockC.NO).sord;
 			var objKeys = Array.prototype.slice.call(tempSord.objKeys);
-			objKeys.push(this.createObjKey(maskLineId, maskLineKey, inputString));
+			objKeys.push(this.createObjKey(--maskLineId, maskLineKey, inputString));
 			tempSord.objKeys = objKeys;
             ixConnect.ix().checkinSord(tempSord, SordC.mbAll, LockC.NO);
             
@@ -478,15 +486,21 @@ weinrich.as.Utils = {
 	},
 	
     /**
-    * Setze die Schriftfarbe eines Sords
+    * Setze die Schriftfarbe eines Sords. Die IDs der Farben findet man in der Adminkonsole unter Schriftfarben..
     * @author   Erik Köhler - Weinrich
-    * @param    {Sord}  sord        Sord, für das die Farbe geändert werden soll
-    * @param    {int}   colorId     Id des Icons, welches das Sord bekommen soll
+    * @param    {int}   sordId       Sord ID des Sords, für das die Farbe geändert werden soll
+    * @param    {int}   colorId     Id des Schriftfarbe, welches das Sord bekommen soll
     * @return   {bool}              True, wenn Farbe erfolgreich geändert wurde
-    * TODO Teste mich
+    * @example
+    * var sordId = 43544;
+    * var colorId = 17;        
+    * weinrich.as.Utils.setSordColor(sordId, colorId);
     */
-    setSordColor: function(sord, colorId) {
-		try {           
+    setSordColor: function(sordId, colorId) {
+        try {         
+            var sord = ixConnect.ix().checkoutSord(sordId, EditInfoC.mbAll, LockC.NO).sord;
+            ixConnect.ix().checkinSord(sord, SordC.mbAll, LockC.NO);
+
             //Prüfe, ob es eine NEUE Farbe ist
 			if (sord.kind != colorId) {
 				
@@ -499,19 +513,18 @@ weinrich.as.Utils = {
             return true;
         }
         catch(ex) {
-			this.logging(true, "Es ist ein Fehler beim Setzen der Farbe aufgetreten. " + ex);
+			this.logging(true, "Es ist ein Fehler beim Setzen der Farbe für " + sordId + " aufgetreten. " + ex);
             return false;
         }
 	},
 
     /**
-    * Erstelle neuen Eintrag für Indexfeld
+    * NUR für interne Funktionen dieser Bibliothek. Erstellt einen neuen Eintrag für ein Indexfeld.
     * @author   Erik Köhler - Weinrich
     * @param    {int}       id      Id des Indexfeldes
     * @param    {String}    name    Name des Indexfeldes
     * @param    {String}    value   Wert des Indesfeldes
     * @return   {ObjKey}            Erstellter ObjKey
-    * TODO Teste mich
     */
 	createObjKey: function (id, name, value) {
         var objKey = new ObjKey();
@@ -527,7 +540,10 @@ weinrich.as.Utils = {
     * @param    {int}       sordId  ObjId des Sords, für das ein Feed-Eintrag geschrieben werden soll
     * @param    {String}    text    Text des Feed-Eintrags
     * @return   {bool}              True, wenn Feed-Eintrag erfolgreich geschrieben wurde
-    * TODO Teste mich
+    * @example
+    * var sordId = 43544;
+    * var text = "Dies ist ein Feed Eintrag.";        
+    * weinrich.as.Utils.createFeedEntry(sordId, text);
     */
 	createFeedEntry: function(sordId, text) {
         try {
@@ -547,7 +563,11 @@ weinrich.as.Utils = {
     * @param    {String}    mapName     Name des zu setzenden Mapfeldes
     * @param    {String}    mapValue    Wert, welcher in das Mapfeld geschrieben werden soll
     * @return   {bool}                  True, wenn Mapfeld erfolgreich gesetzt wurde
-    * TODO Teste mich
+    * @example
+    * var sordId = 43544;
+    * var mapName = "NEW_MAPFIELD";
+    * var mapValue = "Dies ist der neue Wert des Mapfeldes.";
+    * weinrich.as.Utils.setMapValue(sordId, mapName, mapValue);
     */
     setMapValue: function (sordId, mapName, mapValue) {
         
@@ -566,13 +586,16 @@ weinrich.as.Utils = {
     * @author   Erik Köhler - Weinrich
     * @param    {int}       sordId      ObjId des Sords, für das das Mapfeld geladen werden soll
     * @param    {String}    mapName     Name des zu ladenden Mapfeldes
-    * @return   {String[]}              Wert des Indexfeldes, bei Fehler undefined
-    * TODO Teste mich
+    * @return   {String}                Wert des Indexfeldes, bei Fehler undefined
+    * @example
+    * var sordId = 43544;
+    * var mapName = "NEW_MAPFIELD";
+    * var mapValue = weinrich.as.Utils.getMapValue(sordId, mapName);
     */
-    getMapValues: function (sordId, mapName) {
+    getMapValue: function (sordId, mapName) {
         
         try {
-            return Packages.de.elo.mover.utils.ELOAsSordUtils.getMapValues(emConnect, sordId, mapName);
+            return Packages.de.elo.mover.utils.ELOAsSordUtils.getMapValues(emConnect, sordId, mapName)[0];
         }
         catch (ex) {
             this.logging(true, "Fehler beim Laden des Wertes eines Mapfeldes für " + sordId + ".\n" + ex);
@@ -584,14 +607,20 @@ weinrich.as.Utils = {
     * Lade die Indexfeld-Werte eines Sords über die ObjKeyId des Indexfeldes
     * @author   Erik Köhler - Weinrich
     * @param    {Sord}      sord       Sord, aus dem der Wert des Indexfelds geladen werden soll
-    * @param    {int}       objKeyId   ObjKeyId des Indexfeldes
-    * @return   {String[]}             Wert des Indexfeldes, bei Fehler undefined
-    * TODO Teste mich
+    * @param    {int}       objKeyId    ObjKeyId des Indexfeldes
+    * @return   {String}                Wert des Indexfeldes, bei Fehler undefined
+    * @example
+    * var sordId = 43544;
+    * var objKeyId = 5;
+    * var ixfValue = weinrich.as.Utils.getIndexfieldValueById(sordId, objKeyId);
     */
-    getIndexfieldValue: function (sord, objKeyId) {
+    getIndexfieldValueById: function (sordId, objKeyId) {
         
         try {
-            return Packages.de.elo.mover.utils.ELOAsSordUtils.getObjKeyData(sord, objKeyId);
+            var sord = ixConnect.ix().checkoutSord(sordId, EditInfoC.mbAll, LockC.NO).sord;
+            ixConnect.ix().checkinSord(sord, SordC.mbAll, LockC.NO);
+
+            return Packages.de.elo.mover.utils.ELOAsSordUtils.getObjKeyData(sord, objKeyId)[0];
         }
         catch (ex) {
             this.logging(true, "Fehler beim Laden des Wertes eines Indexfeldes für " + sord.id + ".\n" + ex);
@@ -604,15 +633,21 @@ weinrich.as.Utils = {
     * @author   Erik Köhler - Weinrich
     * @param    {Sord}      sord                Sord, aus dem der Wert des Indexfelds geladen werden soll
     * @param    {String}    objKeyGroupName     Name des Indexfeldes
-    * @return   {String[]}                      Wert des Indexfeldes, bei Fehler undefined
-    * TODO Teste mich
+    * @return   {String}                        Wert des Indexfeldes, bei Fehler undefined
+    * @example
+    * var sordId = 43544;
+    * var objKeyGroupName = "CONTRACT_NAME";
+    * var ixfValue = weinrich.as.Utils.getIndexfieldValueByName(sordId, objKeyGroupName);
     */
-    getIndexfieldValue: function (sord, objKeyGroupName) {
+    getIndexfieldValueByName: function (sordId, objKeyGroupName) {
         try {
-            return Packages.de.elo.mover.utils.ELOAsSordUtils.getObjKeyData(sord, objKeyGroupName);
+            var sord = ixConnect.ix().checkoutSord(sordId, EditInfoC.mbAll, LockC.NO).sord;
+            ixConnect.ix().checkinSord(sord, SordC.mbAll, LockC.NO);
+
+            return Packages.de.elo.mover.utils.ELOAsSordUtils.getObjKeyData(sord, objKeyGroupName)[0];
         }
         catch (ex) {
-            this.logging(true, "Fehler beim Laden des Wertes eines Mapfeldes für " + sord.id + ".\n" + ex);
+            this.logging(true, "Fehler beim Laden des Wertes eines Mapfeldes für " + sordId + ".\n" + ex);
             return undefined;
         }
 	},

@@ -9,5 +9,18 @@ Integrierte Funktionen:
 3. Funktionen für ELO
 4. Logging
 
+Damit die Bibliothek lauffähig ist, müssen folgende ELO-Bibliotheken included werden:
+
+- lib_Class
+- ix: IndexServer Functions
+- fu: File Utils
+
+Und natürlich die Bibliothek selber:
+
+- lib_weinrich.as
+
+
+
+
 Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="https://github.com/ekWeinrich/Weinrich-Library/issues">hier</a> 
 übermittelt werden.
