@@ -1555,8 +1555,8 @@ weinrich.as.Utils = {
 
 /**
  * Funktionen für Zeit und Datum. Nutzt u.a. Funktionen von:  
- * {@link https://docs.oracle.com/javase/8/docs/api/java/util/Date.html java/util/Date}, 
- * {@link https://docs.oracle.com/javase/7/docs/api/java/util/Calendar.html java/util/Calendar}
+ * - {@link https://docs.oracle.com/javase/8/docs/api/java/util/Date.html java/util/Date}
+ * - {@link https://docs.oracle.com/javase/7/docs/api/java/util/Calendar.html java/util/Calendar}
  * @memberof weinrich.as
  * @namespace weinrich.as.DateUtils
  * @type {object}
@@ -2010,7 +2010,7 @@ weinrich.as.DateUtils = {
 
 /**
  * Funktionen auf Dateiebene. Nutzt u.a. Funktionen von:  
- * {@link https://commons.apache.org/proper/commons-io/apidocs/org/apache/commons/io/FileUtils.html FileUtils}
+ * - {@link https://commons.apache.org/proper/commons-io/apidocs/org/apache/commons/io/FileUtils.html FileUtils}
  * @memberof weinrich.as
  * @namespace weinrich.as.FileUtils
  * @type {object}
