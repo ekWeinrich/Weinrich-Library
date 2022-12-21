@@ -21,9 +21,8 @@ Und natürlich die Bibliothek selber:
 
 Um zu loggen:
 
-//Init log (nur 1 mal am Anfang)
+Init log (nur 1 mal am Anfang)
 weinrich.as.Utils.initLogging(true, "TestRule");
-//eigentliches loggen
 weinrich.as.Utils.logging(false, "TEST-LOG");
 
 

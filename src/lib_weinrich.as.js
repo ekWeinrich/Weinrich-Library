@@ -12,7 +12,7 @@ weinrich.as = {};
  * @memberof weinrich.as
  * @namespace weinrich.as.Utils
  * @type {object}
- * @version 1.0.0
+ * @version 0.0.1 norelease
  */
 weinrich.as.Utils = {
 
@@ -83,21 +83,21 @@ weinrich.as.Utils = {
     * @param    {int}       sordId     ObjId des Sords, in das die Datei importiert werden soll
     * @param    {String}    maskName   Name der Maske, welche die Datei in ELO bekommen soll
     * @param    {Object}    objKeysObj Indexfelder mit Werten, welche das Dokument bekommen soll
-    * @return   {bool}                 True wenn erfolgreich importiert
+    * @return   {int}                  ObjId des neuen Sords
     * @example
     * var file = new File("C:\\temp\\tmp\\tmp1.pdf");
     * var sordId = 10186;
     * var maskId = "Freie Eingabe";
     * var objKeys = { "ELOSTATUS": "Imported" };
-    * weinrich.as.Utils.importDocument(file, sordId, maskId, objKeys);
+    * var newObjId = weinrich.as.Utils.importDocument(file, sordId, maskId, objKeys);
     */
     importDocument: function (file, sordId, maskName, objKeysObj) {
                 
         try {           
-            this.logging(false, "Import file: " + file.name);
+            this.logging(false, "Importiere: " + file.name);
 
             if (this.fileOrDirectoryExists(file)) {
-                this.logging(false, "File not found: " + file.name);
+                this.logging(false, "Datei wurde nicht gefunden.");
                 return false;
             }
             
@@ -113,7 +113,7 @@ weinrich.as.Utils = {
 
             var objKeys = Array.prototype.slice.call(ed.sord.objKeys);
             objKeys.push(this.createObjKey(DocMaskLineC.ID_FILENAME, DocMaskLineC.NAME_FILENAME, file.name));
-            ed.sord.objKeys = objKeys;
+            ed.sord.objKeys = objKeys; 
 
             ed.document.docs = [new DocVersion()];
             ed.document.docs[0].ext = fu.getExt(file);
@@ -123,14 +123,14 @@ weinrich.as.Utils = {
             ed.document.docs[0].uploadResult = ixConnect.upload(ed.document.docs[0].url, file);
             ed.document = ixConnect.ix().checkinDocEnd(ed.sord, SordC.mbAll, ed.document, LockC.NO);
 
-            this.logging(false, "Successfully imported " + file.name);
+            this.logging(false, file.name + " wurde erfolgreich importiert.");
 
-            return true;
+            return ed.document.objId;
         }
         catch (ex) {
             this.logging(true, "Fehler beim importieren der Datei " + file.name + "\n" + ex);
             
-            return false;
+            return -1;
         }
   	},
 
@@ -142,10 +142,7 @@ weinrich.as.Utils = {
     */
 	doubletExists: function (file) {
 		
-		if (Packages.de.elo.mover.utils.ELOAsUtils.findDoublet(emConnect, file))			
-			return true;
-		else		
-			return false;
+        return Packages.de.elo.mover.utils.ELOAsUtils.findDoublet(emConnect, file);
 	},
 
     /**
@@ -195,7 +192,7 @@ weinrich.as.Utils = {
     * @author   Erik Köhler - Weinrich
     * @param    {int}   srcId       ObjId des zu verschiebenden Sords
     * @param    {int}   destId      ObjId des Verzeichnisses, in das das Sord verschoben werden soll
-    * @return   {bool}              True wenn Elternverzeichnis gelöscht wurde, weil es leer wurde
+    * @return   {bool}              True wenn Elternverzeichnis gelöscht wurde, weil es leer wurde. Bei Fehler -1.
     * @example
     * var sordId = 10144;
     * var destId = 8713;                
@@ -203,15 +200,23 @@ weinrich.as.Utils = {
     */
     moveSordCleanUpAfter: function(srcId, destId) {
 		
-        //Lade Sord über ObjId
-        var sourceSord = ixConnect.ix().checkoutSord(srcId, EditInfoC.mbAll, LockC.NO).sord;
-        ixConnect.ix().checkinSord(sourceSord, SordC.mbAll, LockC.NO);
-        
-		//Verschiebe das Dokument in das passende Verzeichnis
-        ixConnect.ix().copySord(destId, sourceSord.id, null, CopySordC.MOVE);
+        try {
 
-        //Lösche Eltern-Sord, wenn dieses nach dem Verschieben leer wurde
-        return this.deleteSord(sourceSord.parentId, true);
+            //Lade Sord über ObjId
+            var sourceSord = this.getSordById(srcId);
+            if (sourceSord === undefined) throw "Error loading Sord...";
+                        
+            //Verschiebe das Dokument in das passende Verzeichnis
+            ixConnect.ix().copySord(destId, sourceSord.id, null, CopySordC.MOVE);
+
+            //Lösche Eltern-Sord, wenn dieses nach dem Verschieben leer wurde
+            return this.deleteSord(sourceSord.parentId, true);
+        }
+        catch (ex) {
+            this.logging(true, "Fehler beim Verschieben des Sords " + srcId + ".\n" + ex);
+            return -1;            
+        }
+        
     },
     
     /**
@@ -225,66 +230,234 @@ weinrich.as.Utils = {
     */
     deleteSordCleanUpAfter: function (srcId) {
         
-		//Lade Sord über ObjId
-        var sourceSord = ixConnect.ix().checkoutSord(srcId, EditInfoC.mbAll, LockC.NO).sord;
-        ixConnect.ix().checkinSord(sourceSord, SordC.mbAll, LockC.NO);
+        try {
+            //Lade Sord über ObjId
+            var sourceSord = this.getSordById(srcId);
+            if (sourceSord === undefined) throw "Error loading Sord...";
 
-		//Lösche Sord
-        this.deleteSord(sourceSord.id, false);
+            //Lösche Sord
+            this.deleteSord(sourceSord.id, false);
 
-        //Lösche Eltern-Sord, wenn dieses nach dem Löschen leer wurde
-        return this.deleteSord(sourceSord.parentId, true);
+            //Lösche Eltern-Sord, wenn dieses nach dem Löschen leer wurde
+            return this.deleteSord(sourceSord.parentId, true);
+        }
+        catch (ex) {
+            this.logging(true, "Fehler beim Löschen des Sords " + srcId + ".\n" + ex);
+            return -1;            
+        }
 	},
-	
+
     /**
-    * Filtert die übergebene ArrayList. Prüft, ob ein string in der Kurzbezeichnung/Maske/Indexfeld existiert und
-    * entfernt alle anderen aus der Liste.
+    * Filtert die übergebene ArrayList nach Sords, dessen Kurzbezeichnung den Filterwert enthält.
+    * @author   Erik Köhler - Weinrich
+    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)"
+    * @param    {String}                    filterValue            Wert, nach dem gefiltert wird
+    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
+    * @example
+    * var sord = weinrich.as.Utils.getSordById(43532);        
+    * var childSords = weinrich.as.Utils.getChildSordsById(sord.id);
+    * var filteredArrayList = weinrich.as.Utils.filterArrayListByNameContains(childSords, "Mietvertrag");
+    */
+    filterArrayListByNameContains: function(sordArrList, filterValue) {
+
+        //Erstelle einen Iterator für die ArrayList mit Sords
+        var iterator = sordArrList.iterator();
+
+        //Iteriere durch alle Elemente
+         while (iterator.hasNext()) {   
+            
+            var sordArrListValue = iterator.next().name;    
+
+            //Prüfe, ob der String, nach dem gefiltert werden soll, in der Kurzbezeichnung existiert
+            if (!sordArrListValue.contains(filterValue)) {
+                //Entferne bei Sord aus der ArrayList
+                iterator.remove();
+            }
+        }
+
+        return sordArrList;
+    },
+
+    /**
+    * Filtert die übergebene ArrayList nach Sords, dessen Kurzbezeichnung dem Filterwert entspricht.
+    * @author   Erik Köhler - Weinrich
+    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)"
+    * @param    {String}                    filterValue            Wert, nach dem gefiltert wird
+    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
+    * @example
+    * var sord = weinrich.as.Utils.getSordById(43532);        
+    * var childSords = weinrich.as.Utils.getChildSordsById(sord.id);
+    * var filteredArrayList = weinrich.as.Utils.filterArrayListByNameEquals(childSords, "C000033 Mietvertrag");
+    */
+    filterArrayListByNameEquals: function(sordArrList, filterValue) {
+
+        //Erstelle einen Iterator für die ArrayList mit Sords
+        var iterator = sordArrList.iterator();
+
+        //Iteriere durch alle Elemente
+         while (iterator.hasNext()) {   
+            
+            var sordArrListValue = iterator.next().name;    
+
+            //Prüfe, ob der String, nach dem gefiltert werden soll, in der Kurzbezeichnung existiert
+            if (sordArrListValue != filterValue) {
+                //Entferne bei Sord aus der ArrayList
+                iterator.remove();
+            }
+        }
+
+        return sordArrList;
+    },
+
+    /**
+    * Filtert die übergebene ArrayList nach Sords, dessen Kurzbezeichnung dem Regex entsprechen.
+    * @author   Erik Köhler - Weinrich
+    * @param    {java.util.ArrayList<Sord>} sordArrList         Zu filternde ArrayList (Java)"
+    * @param    {String}                    regex               Regex für die Kurzbezeichnung
+    * @return   {java.util.ArrayList<Sord>}                     Gefilterte Arraylist
+    * @example
+    * var regEx = "(C[0-9]{6})";
+    * var sord = weinrich.as.Utils.getSordById(43532);        
+    * var childSords = weinrich.as.Utils.getChildSordsById(sord.id);
+    * var filteredArrayList = weinrich.as.Utils.filterArrayListByNameRegex(childSords, regEx);
+    */
+    filterArrayListByNameRegex: function(sordArrList, regex) {
+
+        //Erstelle einen Iterator für die ArrayList mit Sords
+        var iterator = sordArrList.iterator();
+
+        //Iteriere durch alle Elemente
+        while (iterator.hasNext()) {   
+            
+            var sordArrListValue = iterator.next().name;  
+
+            //Prüfe, ob der Kurzbezeichnung dem Regex entspricht
+            if (sordArrListValue.search(regex) == -1) {
+                //Entferne Sord aus der ArrayList
+                iterator.remove();
+            }
+        }
+
+        return sordArrList;
+    },
+
+    /**
+    * Filtert die übergebene ArrayList nach Sords mit der uebergebenen Maske
+    * @author   Erik Köhler - Weinrich
+    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)"
+    * @param    {String}                    filterValue            Maske, nach der gefiltert wird
+    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist                   Gefilterte Arraylist
+    * @example
+    * var sord = weinrich.as.Utils.getSordById(43532);
+    * var contractSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
+    */
+    filterArrayListByMask: function(sordArrList, maskname) {
+
+        //Erstelle einen Iterator für die ArrayList mit Sords
+        var iterator = sordArrList.iterator();
+
+        //Iteriere durch alle Elemente
+         while (iterator.hasNext()) {   
+            
+            var sordArrListValue = iterator.next().maskName;    
+
+            //Prüfe, ob der String, nach dem gefiltert werden soll, in der Kurzbezeichnung existiert
+            if (!sordArrListValue.contains(maskname)) {
+                //Entferne bei Sord aus der ArrayList
+                iterator.remove();
+            }
+        }
+
+        return sordArrList;
+    },
+
+    /**
+    * Filtert die übergebene ArrayList. Prüft, ob das Indexfeld einen Wert beinhaltet.
     * @author   Erik Köhler - Weinrich
     * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)
-    * @param    {String}                    filterType             Art nach der gefiltert werden soll
-    *                                                              Valide Werte: "Kurzbezeichnung", "Maske", "Indexfeld"
     * @param    {String}                    filterValue            Wert, nach dem gefiltert wird
-    * @param    {String}                    fieldToFilterWith      Wenn filterType=Indexfeld, erwartet Name des Indexfeldes
+    * @param    {String}                    fieldToFilterWith      Name des Indexfeldes
     * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
-    * TODO Teste mich
+    * @example
+    * var sord = weinrich.as.Utils.getSordById(43532);
+    * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
+    * var filteredArrayList = weinrich.as.Utils.filterArrayListIndexfieldContains(childSords, "Mietvertrag", "CONTRACT_NAME");
     */
-    filterArrayListContains: function(sordArrList, filterType, filterValue, fieldToFilterWith) {
+    filterArrayListIndexfieldContains: function(sordArrList, filterValue, fieldToFilterWith) {
 
         //Erstelle einen Iterator für die ArrayList mit Sords
         var iterator = sordArrList.iterator();
 
         //Iteriere durch alle Elemente
         while (iterator.hasNext()) {            
-            var sordArrListValue = "";
+            
+            var sordArrListValue = this.getIndexfieldValueByName(iterator.next().id, fieldToFilterWith);
 
-            //Filtere die Liste abhängig von dem Ziel des Filters
-            switch(filterType){
-                case "Kurzbezeichnung": 
-                    sordArrListValue = iterator.next().name;
-                    break;
-
-                case "Maske": 
-                    sordArrListValue = iterator.next().maskName;
-                    break;
-
-                case "Indexfeld":
-
-                    try {
-                        sordArrListValue = this.getIndexfieldValue(iterator.next(), fieldToFilterWith)[0];
-                    }
-                    catch (ex) {
-                        // ! Error beim Filtern nach Indexfeld
-                        this.logging(true, "Fehler beim Filtern nach Indexfeld. " + ex);
-                    }
-                    
-                    break;
-                
-                default:
-                    break;
-            }           
-
-            //Prüfe, ob der String, nach dem gefiltert werden soll, in der Kurzbezeichnung existiert
+            //Prüfe, ob der String, nach dem gefiltert werden soll, im Indexfeld existiert
             if (!sordArrListValue.contains(filterValue)) {
+                //Entferne bei Sord aus der ArrayList
+                iterator.remove();
+            }
+        }
+
+        return sordArrList;
+    },
+
+    /**
+    * Filtert die übergebene ArrayList. Prüft, ob das Indexfeld gleich einem Wert ist.
+    * @author   Erik Köhler - Weinrich
+    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)
+    * @param    {String}                    filterValue            Wert, nach dem gefiltert wird
+    * @param    {String}                    fieldToFilterWith      Name des Indexfeldes
+    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
+    * @example
+    * var sord = weinrich.as.Utils.getSordById(43532);
+    * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
+    * var filteredArrayList = weinrich.as.Utils.filterArrayListIndexfieldEquals(childSords,  "Mietverträge Seniorenwohnanlagen", "CONTRACT_TYPE");
+    */
+    filterArrayListIndexfieldEquals: function(sordArrList, filterValue, fieldToFilterWith) {
+
+        //Erstelle einen Iterator für die ArrayList mit Sords
+        var iterator = sordArrList.iterator();
+
+        //Iteriere durch alle Elemente
+        while (iterator.hasNext()) {            
+            
+            var sordArrListValue = this.getIndexfieldValueByName(iterator.next().id, fieldToFilterWith);
+
+            if (sordArrListValue != filterValue) {
+                //Entferne bei Sord aus der ArrayList
+                iterator.remove();
+            }
+        }
+
+        return sordArrList;
+    },
+
+    /**
+    * Filtert die übergebene ArrayList. Prüft, ob das Indexfeld gleich Regex entspricht.
+    * @author   Erik Köhler - Weinrich
+    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)
+    * @param    {String}                    filterValue            Wert, nach dem gefiltert wird
+    * @param    {String}                    fieldToFilterWith      Name des Indexfeldes
+    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
+    * @example
+    * var regEx = "(C[0-9]{6})";
+    * var sord = weinrich.as.Utils.getSordById(43532);
+    * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
+    * var filteredArrayList = weinrich.as.Utils.filterArrayListIndexfieldRegex(childSords, regEx, "CONTRACT_NAME");
+    */
+    filterArrayListIndexfieldRegex: function(sordArrList, filterValue, fieldToFilterWith) {
+
+        //Erstelle einen Iterator für die ArrayList mit Sords
+        var iterator = sordArrList.iterator();
+
+        //Iteriere durch alle Elemente
+        while (iterator.hasNext()) {            
+            
+            var sordArrListValue = this.getIndexfieldValueByName(iterator.next().id, fieldToFilterWith);
+
+            if (sordArrListValue.search(filterValue) == -1) {
                 //Entferne bei Sord aus der ArrayList
                 iterator.remove();
             }
@@ -406,6 +579,7 @@ weinrich.as.Utils = {
 		
 		//Lade das Elterverzeichnis
 		var sords = Packages.de.elo.mover.utils.ELOAsUtils.getSubFolders(emConnect, parentId);
+        if (sords === undefined) throw "Error loading Sords...";
 				
         //Gehe alle Unterordner durch und suche nach der Kurzbezeichnung
 		for(var i = 0; i < sords.length; i++) {
@@ -435,6 +609,7 @@ weinrich.as.Utils = {
         try {
             var sordZ = new SordZ(SordC.mbId | SordC.mbType);
             var sord = ixConnect.ix().checkoutSord(sordId, sordZ, LockC.NO);
+            if (sord === undefined) throw "Error loading Sord...";
 
             if (sord.type != iconId) {
 
@@ -497,9 +672,9 @@ weinrich.as.Utils = {
     * weinrich.as.Utils.setSordColor(sordId, colorId);
     */
     setSordColor: function(sordId, colorId) {
-        try {         
-            var sord = ixConnect.ix().checkoutSord(sordId, EditInfoC.mbAll, LockC.NO).sord;
-            ixConnect.ix().checkinSord(sord, SordC.mbAll, LockC.NO);
+        try {    
+            var sord = this.getSordById(sordId);
+            if (sord === undefined) throw "Error loading Sord...";
 
             //Prüfe, ob es eine NEUE Farbe ist
 			if (sord.kind != colorId) {
@@ -582,7 +757,7 @@ weinrich.as.Utils = {
 	},
 
     /**
-    * Lade die Mapfeld-Werte eines Sords über den Namen des Mapfeldes
+    * Lade die Mapfeld-Werte eines Sords über den Namen des Mapfeldes.
     * @author   Erik Köhler - Weinrich
     * @param    {int}       sordId      ObjId des Sords, für das das Mapfeld geladen werden soll
     * @param    {String}    mapName     Name des zu ladenden Mapfeldes
@@ -604,7 +779,7 @@ weinrich.as.Utils = {
 	},
 
     /**
-    * Lade die Indexfeld-Werte eines Sords über die ObjKeyId des Indexfeldes
+    * Lade die Indexfeld-Werte eines Sords über die ObjKeyId des Indexfeldes.
     * @author   Erik Köhler - Weinrich
     * @param    {Sord}      sord       Sord, aus dem der Wert des Indexfelds geladen werden soll
     * @param    {int}       objKeyId    ObjKeyId des Indexfeldes
@@ -617,8 +792,9 @@ weinrich.as.Utils = {
     getIndexfieldValueById: function (sordId, objKeyId) {
         
         try {
-            var sord = ixConnect.ix().checkoutSord(sordId, EditInfoC.mbAll, LockC.NO).sord;
-            ixConnect.ix().checkinSord(sord, SordC.mbAll, LockC.NO);
+
+            var sord = this.getSordById(sordId);                
+            if (sord === undefined) throw "Error loading Sord...";
 
             return Packages.de.elo.mover.utils.ELOAsSordUtils.getObjKeyData(sord, objKeyId)[0];
         }
@@ -629,7 +805,7 @@ weinrich.as.Utils = {
     },
     
     /**
-    * Lade die Indexfeld-Werte eines Sords über den Namen des Indexfeldes
+    * Lade die Indexfeld-Werte eines Sords über den Namen des Indexfeldes.
     * @author   Erik Köhler - Weinrich
     * @param    {Sord}      sord                Sord, aus dem der Wert des Indexfelds geladen werden soll
     * @param    {String}    objKeyGroupName     Name des Indexfeldes
@@ -640,68 +816,29 @@ weinrich.as.Utils = {
     * var ixfValue = weinrich.as.Utils.getIndexfieldValueByName(sordId, objKeyGroupName);
     */
     getIndexfieldValueByName: function (sordId, objKeyGroupName) {
+        
         try {
-            var sord = ixConnect.ix().checkoutSord(sordId, EditInfoC.mbAll, LockC.NO).sord;
-            ixConnect.ix().checkinSord(sord, SordC.mbAll, LockC.NO);
 
+            var sord = this.getSordById(sordId);            
+            if (sord === undefined) throw "Error loading Sord...";
+                
             return Packages.de.elo.mover.utils.ELOAsSordUtils.getObjKeyData(sord, objKeyGroupName)[0];
         }
         catch (ex) {
-            this.logging(true, "Fehler beim Laden des Wertes eines Mapfeldes für " + sordId + ".\n" + ex);
-            return undefined;
-        }
-	},
-	
+            this.logging(true, "Fehler beim Laden des Wertes eines Indexfeldes für " + sordId + ".\n" + ex);
+        }        
+    },
+    
     /**
-    * Setze den Wert eines Indexfeldes in einem Sord über die ObjKeyId des Indexfeldes
+    * Lade alle Kind-Sords eines Eltern-Sords über dessen Id.
     * @author   Erik Köhler - Weinrich
-    * @param    {Sord}      sord        Sord, in dem der Wert des Indexfelds gesetzt werden soll
-    * @param    {String}    objKeyId    ObjKeyId des Indexfeldes
-    * @param    {String}    data        Wert, der in das Indexfeld geschrieben werden soll
-    * @return   {bool}                  True, wenn Indexfeld erfolgreich gesetzt wurde
-    * TODO Teste mich
-    */
-    setIndexfieldValue: function (sord, objKeyId, data) {
-        
-        try {
-            Packages.de.elo.mover.utils.ELOAsSordUtils.setObjKeyData(sord, objKeyId, data);
-            return true;
-        }
-        catch (ex) {
-            this.logging(true, "Fehler beim Setzen des Wertes eines Indexfeldes für " + sord.id + ".\n" + ex);
-            return false;
-        }
-	},
-
-    /**
-    * Setze den Wert eines Indexfeldes in einem Sord über den Namen des Indexfeldes
-    * @author   Erik Köhler - Weinrich
-    * @param    {Sord}      sord                Sord, in dem der Wert des Indexfelds gesetzt werden soll
-    * @param    {String}    objKeyGroupName     Name des Indexfeldes
-    * @param    {String}    data                Wert, der in das Indexfeld geschrieben werden soll
-    * @return   {bool}                          True, wenn Indexfeld erfolgreich gesetzt wurde
-    * TODO Teste mich
-    */
-    setIndexfieldValue: function (sord, objKeyGroupName, data) {
-        
-        try {
-            Packages.de.elo.mover.utils.ELOAsSordUtils.setObjKeyData(sord, objKeyGroupName, data);
-            return true;
-        }
-        catch (ex) {
-            this.logging(true, "Fehler beim Setzen des Wertes eines Indexfeldes für " + sord.id + ".\n" + ex);
-            return false;
-        }
-	},
-
-    /**
-    * Lade alle Kind-Sords eines Eltern-Sords über dessen Id
-    * @author   Erik Köhler - Weinrich
-    * @param    {int}                           parentId    Eltern-Sord für das alle Kind-Sords geladen werden sollen
+    * @param    {int}                           parentId    Eltern-SordId für das alle Kind-Sords geladen werden sollen
     * @return   {java.util.ArrayList<Sord>}                 Alle Kind-Sords des Eltern-Sords
-    * TODO Teste mich
+    * @example
+    * var sordId = 43524;        
+    * var childSords = weinrich.as.Utils.getChildSordsById(sordId);
     */
-    getChildren: function (parentId) {	
+    getChildSordsById: function (parentId) {	
         
         try {
             return Packages.de.elo.mover.utils.ELOAsSordUtils.getChildren(emConnect, parentId);
@@ -713,16 +850,42 @@ weinrich.as.Utils = {
 	},
 
     /**
-    * Lade alle Unterverzeichnisse eines Sords über dessen Id
+    * Lade alle Kind-Sords eines Eltern-Sords über dessen Pfad.
+    * @author   Erik Köhler - Weinrich
+    * @param    {String}                        path    ELO-Pfad des Sords
+    * @return   {java.util.ArrayList<Sord>}             Alle Kind-Sords des Eltern-Sords
+    * @example
+    * var sordId = 43524;
+    * var path = weinrich.as.Utils.getSordPathById(sordId);
+    * var childSords = weinrich.as.Utils.getChildSordsByPath(path);
+    */
+    getChildSordsByPath: function (path) {	
+            
+        try {
+            var sord = this.getSordByArcpath(path);
+            if (sord === undefined) throw "Error loading Sord...";
+
+            return Packages.de.elo.mover.utils.ELOAsSordUtils.getChildren(emConnect, sord.parentId);
+        }
+        catch (ex) {
+            this.logging(true, "Fehler beim Laden aller Kind-Sords von  " + path + ".\n" + ex);
+            return undefined;
+        }
+    },
+
+    /**
+    * Lade alle Unterverzeichnisse eines Sords über dessen Id.
     * @author   Erik Köhler - Weinrich
     * @param    {int}                           parentId    Sord, für das die Unterverzeichnisse geladen werden sollen
     * @return   {java.util.ArrayList<Sord>}                 Alle Unterverzeichnisse des Sords
-    * TODO Teste mich
+    * @example
+    * var sordId = 43524;        
+    * var childFolderSords = weinrich.as.Utils.getChildFolderSordsById(sordId);
     */
-    getSubFolders: function (parentId) {		
+    getChildFolderSordsById: function (parentId) {		
         
         try {
-            return Packages.de.elo.mover.utils.ELOAsUtils.getSubFolders(emConnect, sourceSordId);	
+            return Packages.de.elo.mover.utils.ELOAsUtils.getSubFolders(emConnect, parentId);	
         }
         catch (ex) {
             this.logging(true, "Fehler beim Laden der Unterverzeichnisse von  " + parentId + ".\n" + ex);
@@ -731,13 +894,39 @@ weinrich.as.Utils = {
 	},
 
     /**
-    * Gibt den Pfad eines Sords über seine ID zurück
+    * Lade alle Unterverzeichnisse eines Sords über dessen Pfad.
+    * @author   Erik Köhler - Weinrich
+    * @param    {String}                        path    ELO-Pfad des Sords
+    * @return   {java.util.ArrayList<Sord>}             Alle Unterverzeichnisse des Sords
+    * @example
+    * var sordId = 43524;
+    * var path = weinrich.as.Utils.getSordPathById(sordId);
+    * var childFolderSords = weinrich.as.Utils.getChildFolderSordsByPath(path);
+    */
+    getChildFolderSordsByPath: function (path) {		
+        
+        try {
+            var sord = this.getSordByArcpath(path);
+            if (sord === undefined) throw "Error loading Sord...";
+
+            return Packages.de.elo.mover.utils.ELOAsUtils.getSubFolders(emConnect, sord.parentId);	
+        }
+        catch (ex) {
+            this.logging(true, "Fehler beim Laden der Unterverzeichnisse von  " + path + ".\n" + ex);
+            return undefined;
+        }
+	},
+
+    /**
+    * Gibt den Pfad eines Sords über seine ID zurück. Führend mit Namen des Archivs.
     * @author   Erik Köhler - Weinrich
     * @param    {int}        sordId     Sord, für das der ELO-Pfad bestimmt werden soll
     * @return   {String}                ELO-Pfad des Sords
-    * TODO Teste mich
+    * @example
+    * var sordId = 4907; 
+    * var path = weinrich.as.Utils.getArcpathById(sordId);
     */
-    getElementPath: function (sordId) {	
+    getArcpathById: function (sordId) {	
         try {
             return Packages.de.elo.mover.utils.ELOAsUtils.getElementPath(emConnect, sordId);
         }
@@ -745,41 +934,153 @@ weinrich.as.Utils = {
             this.logging(true, "Fehler beim Bestimmen des ELO-Pfades von Sord " + sordId + ".\n" + ex);
             return undefined;
         }
-	},
-
-    /**
-    * Gibt ein Sord über seinen Arc-Pfad zurück
-    * @author   Erik Köhler - Weinrich
-    * @param    {String}    path    Vollständiger Pfad des zu ladenden Sords
-    * @return   {Sord}              Sord, der über den Pfad geladen wurde
-    * TODO Teste mich
-    */ 
-    getElemByArcpath: function (path) {		
-        try {
-            return Packages.de.elo.mover.utils.ELOAsUtils.getElemByArcpath(emConnect, path);	
-        }
-        catch (ex) {
-            this.logging(true, "Fehler beim Laden eines Sords über seinen Arc-Pfad. " + path + ".\n" + ex);
-            return undefined;
-        }
     },
-
+    
     /**
-    * Gibt ein Sord über seinen relativen Arc-Pfad zurück
+    * Gibt den ELO-Pfad des Eltern-Sords an, indem das Kind-Sord aus dem Pfad abgeschnitten wird.
     * @author   Erik Köhler - Weinrich
-    * @param    {String}    path    Vollständiger Pfad des zu ladenden Sords
-    * @return   {Sord}              Sord, der über den  relativen Arc-Pfad geladen wurde
-    * TODO Teste mich
+    * @param    {String}    path    Pfad des Kind-Sords
+    * @return   {String}            Pfad des Eltern-Sords
+    * @example
+    * var sordId = 4907; 
+    * var path = weinrich.as.Utils.getArcpathById(sordId);
+    * var parentPath = weinrich.as.Utils.getParentArcpathByPath(path);
     */
-    getElemByArcpath: function (path, rootId) {		
+    getParentArcpathByPath: function (path) {	
+
         try {
-            return Packages.de.elo.mover.utils.ELOAsUtils.getElemByArcpath(emConnect, rootId, path);	
+
+            var eloPath = this.convertArcpathToELOPath(path); 
+            if (eloPath === undefined) throw "Error converting path...";
+                
+            if (eloPath.endsWith("¶"))
+                eloPath = eloPath.substring(0, eloPath.length - 1);
+
+            var splitPathArr = eloPath.split("¶");
+            var newEloPath = "";
+            
+            for (var i = 0; i < (splitPathArr.length-1); i++){
+                newEloPath += splitPathArr[i] + "¶";
+                newEloPath = newEloPath.replace("¶¶", "¶");
+            }
+
+            return newEloPath;
         }
         catch (ex) {
-            this.logging(true, "Fehler beim Laden eines Sords über seinen relativen Arc-Pfad. " + path + ".\n" + ex);
+            this.logging(true, "Fehler beim Bestimmen des ELO-Pfades des Eltern-Sords von " + path + ".\n" + ex);
             return undefined;
         }
     },
+
+    /**
+    * Gibt ein Sord über seinen Arc-Pfad zurück.
+    * @author   Erik Köhler - Weinrich
+    * @param    {String}    path    Vollständiger Pfad des zu ladenden Sords. 
+    *                               Akzeptiert Format "Archivname//T1 Schulung//000 Documents" und Format "¶T1 Schulung¶000 Documents".
+    * @return   {Sord}              Sord, der über den Pfad geladen wurde. Bei Fehler wird undefined zurückgegeben.
+    * @example
+    * var sordId = 4907; 
+    * var path = weinrich.as.Utils.getArcpathById(sordId); //Gibt etwas wie "Archivname//T1 Schulung//000 Documents" zurück
+    * var sord = weinrich.as.Utils.getSordByArcpath(path); //Akzeptiert Format "Archivname//T1 Schulung//000 Documents" und Format "¶T1 Schulung¶000 Documents"
+    */ 
+    getSordByArcpath: function (path) {	
+
+        return this.getSordByRelativeArcpath(path);
+        // try {
+
+        //     var eloPath = this.convertArcpathToELOPath(path); 
+        //     if (eloPath === undefined) throw "Error converting path...";
+
+        //     return Packages.de.elo.mover.utils.ELOAsUtils.getElemByArcpathRelative(emConnect, 1, eloPath);	
+        // }
+        // catch (ex) {
+        //     this.logging(true, "Fehler beim Laden eines Sords über seinen Arc-Pfad. " + path + ".\n" + ex);
+        // }
+
+        // return undefined;
+    },
+
+    /**
+    * Gibt ein Sord über seinen relativen Arc-Pfad zurück. Standard für Archiv: rootId=1.
+    * @author   Erik Köhler - Weinrich
+    * @param    {String}    path    Vollständiger Pfad des zu ladenden Sords
+    * @param    {int}       rootId  ObjID des Sords, von dem aus der Pfad beginnen soll. Wurde es nicht angegeben, beginne aus Archivverzeichnis.
+    * @return   {Sord}              Sord, der über den  relativen Arc-Pfad geladen wurde
+    * @example
+    * var rootId = 4907; 
+    * var relativePath = "//Ordner//Temp";
+    * var sord1 = weinrich.as.Utils.getSordByRelativeArcpath(relativePath, rootId); //Relativer Pfad ab angegebenem Rootverzeichnis
+    * var sord2 = weinrich.as.Utils.getSordByRelativeArcpath(relativePath); //Relativer Pfad ab Archiv als Rootverzeichnis
+    */
+    getSordByRelativeArcpath: function (path, rootId) {		
+        try {
+            var eloPath = this.convertArcpathToELOPath(path); 
+            if (eloPath === undefined) throw "Error converting path...";
+            
+            //Wurde KEINE ObjId als Rootverzeichnis angegeben, wird das Archiv als Rootverzeichnis gewählt
+            if(rootId)
+                return Packages.de.elo.mover.utils.ELOAsUtils.getElemByArcpathRelative(emConnect, rootId, eloPath);	
+            else
+                return Packages.de.elo.mover.utils.ELOAsUtils.getElemByArcpathRelative(emConnect, 1, eloPath);	
+        }
+        catch (ex) {
+            this.logging(true, "Fehler beim Laden eines Sords über seinen relativen Arc-Pfad. " + eloPath + ".\n" + ex);
+        }
+
+        return undefined;
+    },
+
+    /**
+    * Konvertiert einen Arc-Pfad in einen ELO-Pfad. Entfernt führende "ARCPATH:" bzw. Archivnamen und ersetzt "//" mit "¶".
+    * Beispiel: "Archivname//T1 Schulung//000 Documents" zu "¶T1 Schulung¶000 Documents¶"
+    * @author   Erik Köhler - Weinrich
+    * @param    {String}    path    Zu konvertierender Pfad (z.B.: "Archivname//T1 Schulung//000 Documents")
+    * @return   {String}            Konvertierter Pfad (-> "¶T1 Schulung¶000 Documents¶")
+    * @example
+    * var sordId = 4907; 
+    * var path = weinrich.as.Utils.getArcpathById(sordId); //Gibt etwas wie "Archivname//T1 Schulung//000 Documents" zurück
+    * var eloPath = weinrich.as.Utils.convertArcpathToELOPath(path);
+    */
+    convertArcpathToELOPath: function(path) {
+		
+        try {
+            eloPath = String(path);
+
+            //Entferne das root-Verzeichnis aus dem Pfad
+            if (eloPath.startsWith("ARCPATH:")) {
+                eloPath = eloPath.replace("ARCPATH:", "");
+            }
+
+            //Entferne den Archivnamen aus dem Pfad
+            var archiveName = this.getArchiveName();
+            if (eloPath.startsWith(archiveName)) {
+                eloPath = eloPath.replace(archiveName, "");
+            }            
+            
+            //Ersetze alle // mit ¶, um einen validen ELO-Pfad zu erzeugen
+            if (eloPath.indexOf("//") >= 0) {
+
+                var splitPathArr = eloPath.split("//");
+                var splitPath = "";
+                
+                for (var i = 0; i < splitPathArr.length; i++){
+                    splitPath += splitPathArr[i] + "¶";
+                    splitPath = splitPath.replace("¶¶", "¶");
+                }
+                eloPath = splitPath;
+            }
+
+            if (!eloPath.startsWith("¶")) { 
+                eloPath = "¶" + eloPath;
+            }
+                        
+            return eloPath;
+        }
+        catch (ex) {
+            this.logging(true, "Fehler beim Konvertieren des ELO-Pfades von " + path + " zu " + eloPath +  ".\n" + ex);
+            return undefined;
+        }
+	},
 
     /**
     * Fügt ein neues Verzeichnis über den übergebenen Pfad in ELO hinzu und gibt dessen ObjId zurück.
@@ -787,20 +1088,44 @@ weinrich.as.Utils = {
     * @author   Erik Köhler - Weinrich
     * @param    {String}    path    Vollständiger Pfad des zu ladenden Sords
     * @return   {int}               ObjId des neu angelegten Verzeichnisses
-    * TODO Teste mich
     */
-    createArcPath: function(eloPath) {
+    createFolderByPath: function(path) {
 		
         try {
-            //Entferne das root-Verzeichnis aus dem Pfad
-            eloPath = eloPath.replace("ARCPATH:","");
+            var eloPath = this.convertArcpathToELOPath(path);
+            
+            if (eloPath === undefined) throw "Error converting path...";
             
             return Packages.de.elo.mover.utils.ELOAsUtils.createArcPath(emConnect, 1, eloPath);
         }
         catch (ex) {
-            this.logging(true, "Fehler beim Erstellen des neuen Verzeichnisses. " + eloPath + ".\n" + ex);
+            this.logging(true, "Fehler beim Erstellen des neuen Verzeichnisses. " + path + ".\n" + ex);
             return -1;
+        }        
+    },
+    
+    /**
+    * Fügt ein neues Verzeichnis über den übergebenen Pfad in ELO hinzu und gibt dessen ObjId zurück.
+    * Der Pfad wird vollständig angelegt.
+    * @author   Erik Köhler - Weinrich
+    * @param    {String}    path    Vollständiger Pfad des zu ladenden Sords
+    * @param    {int}       rootId  
+    * @return   {int}               ObjId des neu angelegten Verzeichnisses
+    */
+    createFolderByRelativePath: function(path, rootId) {
+		
+        try {
+            var eloPath = this.convertArcpathToELOPath(path);
+
+            if (eloPath === undefined) throw "Error converting path...";
+                
+            return Packages.de.elo.mover.utils.ELOAsUtils.createArcPath(emConnect, rootId, eloPath);
         }
+        catch (ex) {
+            this.logging(true, "Fehler beim Erstellen des neuen Verzeichnisses. " + eloPath + ".\n" + ex);
+         }
+         
+        return -1;
 	},
 
     /**
@@ -810,9 +1135,8 @@ weinrich.as.Utils = {
     * @param    {String}    folderName  Name des neuen Verzeichnisses
     * @param    {String}    maskName    Name der Maske für das neue Verzeichnis
     * @return   {int}                   ObjId des neu angelegten Verzeichnisses
-    * TODO Teste mich
     */
-    addNewFolder: function (parentId, folderName, maskName) {		
+    createFolderByParentId: function (parentId, folderName, maskName) {		
         
         try {            
 		    return Packages.de.elo.mover.utils.ELOAsUtils.addNewFolder(emConnect, folderName, parentId, maskName);
@@ -824,32 +1148,308 @@ weinrich.as.Utils = {
 	},
 	
     /**
-    * Prüft, ob das Sord eine Referenz ist
+    * Gibt den Namen des Archivs zurück
     * @author   Erik Köhler - Weinrich
-    * @param    {int}    sordId     ObjId, des zu prüfenden Sords
-    * @return   {bool}              True, wenn Sord eine Referenz ist. Bei Fehler gebe -1 zurück
-    * TODO Teste mich
+    * @return   {String}    Name des Archivs
     */
-    isReference: function (sordId) {
-        
+    getArchiveName: function () {
+            
         try {    
-            //Lade Sord über ObjId
+            return Packages.de.elo.mover.utils.ELOAsUtils.getArchiveName(emConnect);
+        }
+        catch (ex) {
+            this.logging(true, "Fehler beim Laden des Namens des Archivs.\n" + ex);
+            return undefined;
+        }
+    },
+
+    /**
+    * Lade Sord über die ObjId. Verwende CheckOut/CheckIn. Führt dies zu Zugriffs-Fehlern wird das Sord über den ermittelten Pfad geladen.
+    * @author   Erik Köhler - Weinrich
+    * @param    {int}       sordId      ObjId, des zu ladenden Sords
+    * @return   {Sord}                  Geladenes Sord, ansonsten undefined
+    */
+    getSordById: function (sordId) {
+        
+        //Lade Sord mit checkout
+        var sord = this.getSordWithCheckOutById(sordId);
+        //Wurde Sord erfolgreich geladen, gebe es zurück
+        if (sord != undefined)
+            return sord;
+        
+        this.logging(true, "Versuche andere Alternative das Sord zu laden...");
+
+        //Gab es einen Fehler mit checkout, versuche Sord über den Pfad zu laden
+        sord = this.getSordWithPathById(sordId);
+        //Wurde Sord erfolgreich geladen, gebe es zurück
+        if (sord != undefined)
+            return sord;
+        
+        //Konnte Sord mit beiden Methoden nicht geladen werden, gebe undefined zurück
+        return undefined;
+    },
+
+    /**
+    * Lade Sord über die ObjId. Verwende CheckOut/CheckIn. Führt dies zu Zugriffs-Fehlern sollte die andere Methode verwendet werden.
+    * @author   Erik Köhler - Weinrich
+    * @param    {int}       sordId      ObjId, des zu ladenden Sords
+    * @return   {Sord}                  Geladenes Sord, ansonsten undefined
+    */
+    getSordWithCheckOutById: function (sordId) {
+            
+        try {    
+
             var sord = ixConnect.ix().checkoutSord(sordId, EditInfoC.mbAll, LockC.NO).sord;
             ixConnect.ix().checkinSord(sord, SordC.mbAll, LockC.NO);
-    
-            return Packages.de.elo.mover.utils.ELOAsSordUtils.isReference(emConnect, sord.id, sord.parentId);
+
+            return sord;
+        }
+        catch (ex) {
+            this.logging(true, "Fehler beim Laden des Sords " + sordId + " über seine Id.\n" + ex);
+            return undefined;
+        }
+    },
+
+    /**
+    * Lade Sord über die ObjId. Verwendet den über die ObjId ermittelten Pfad. 
+    * (Wahrscheinlich unperformanter als über CheckOut/CheckIn, aber ohne Zugriffsprobleme)
+    * @author   Erik Köhler - Weinrich
+    * @param    {int}       sordId      ObjId, des zu ladenden Sords
+    * @return   {Sord}                  Geladenes Sord, ansonsten undefined
+    */
+    getSordWithPathById: function (sordId) {
+            
+        try {    
+            
+            var path = this.getArcpathById(sordId);
+            var sord = this.getSordByArcpath(path);
+
+            return sord;
+        }
+        catch (ex) {
+            this.logging(true, "Fehler beim Laden des Sords " + sordId + " über seine Id.\n" + ex);
+            return undefined;
+        }
+    },
+
+    /**
+    * Prüft, ob das Sord eine Referenz ist über seine ObjId und die ObjId seines Eltern-Sords.
+    * @author   Erik Köhler - Weinrich
+    * @param    {int}    sordId     ObjId, des zu prüfenden Sords
+    * @param    {int}    parentId   ObjId, des Eltern-Sords
+    * @return   {bool}              True, wenn Sord eine Referenz ist. Bei Fehler gebe -1 zurück
+    * @example
+    * var sordId = 51977;
+    * var path = weinrich.as.Utils.getArcpathById(sordId);
+    * var parentPath = weinrich.as.Utils.getParentArcpathByPath(path);
+    * var parentSord = weinrich.as.Utils.getSordByRelativeArcpath(parentPath);
+    * var isReference = weinrich.as.Utils.isReferenceByIds(sordId, parentSord.id);
+    */
+    isReferenceByIds: function (sordId, parentId) {
+        
+        try {
+            return Packages.de.elo.mover.utils.ELOAsSordUtils.isReference(emConnect, sordId, parentId);
         }
         catch (ex) {
             this.logging(true, "Fehler beim Prüfen, ob Sord " + sordId + " eine Referenz ist.\n" + ex);
             return -1;
         }
+    },
+
+     /**
+    * Prüft, ob das Sord an der Stelle des übergebenen Pfades eine Referenz ist.
+    * @author   Erik Köhler - Weinrich
+    * @param    {String}    path    Pfad auf das Sord, welches überprüft werden soll, ob es eine Referenz ist
+    * @return   {bool}              True, wenn Sord eine Referenz ist. Bei Fehler gebe -1 zurück
+    * @example
+    * var sordId = 51977;
+    * var path = weinrich.as.Utils.getArcpathById(sordId);
+    * var isReference = weinrich.as.Utils.isReferenceByPath(path);
+    */
+    isReferenceByPath: function (path) {
+        
+        try {    
+            this.logging(false, "path=" + path);
+
+            //Lade Sord über Pfad
+            var sord = this.getSordByArcpath(path);   
+            if (sord === undefined) throw "Error loading Sord...";
+
+            //Generiere Pfad des Eltern-Sords über den Pfad des Kind-Sords
+            var parentPath = this.getParentArcpathByPath(path);
+            
+            this.logging(false, "parentPath=" + parentPath);
+
+            //Lade Eltern-Sord über den generierten Pfad
+            var parentSord = this.getSordByArcpath(parentPath);   
+            if (parentSord === undefined) throw "Error loading parent Sord...";
+    
+            return Packages.de.elo.mover.utils.ELOAsSordUtils.isReference(emConnect, sord.id, parentSord.id);
+        }
+        catch (ex) {
+            this.logging(true, "Fehler beim Prüfen, ob Sord " + sordId + " eine Referenz ist.\n" + ex);
+            return -1;
+        }
+    },
+    
+    /**
+    * Gibt alle Referenzen eines Sords über dessen ObjId zurück. Beinhaltet ebenfalls den Pfad auf das ursprüngliche Sord.
+    * @author   Erik Köhler - Weinrich
+    * @param    {int}       sordId      Sord, dessen Referenzen zurückgegeben werden sollen.
+    * @return   {String[]}              Pfade auf die Referenzen. Gibt undefined bei Fehler zurück.
+    * @example
+    * var sordId = 51977;
+    * var referencePaths = weinrich.as.Utils.getReferencePathsById(sordId);
+    */
+    getReferencePathsById: function (sordId) {
+        
+        try {        
+            return Packages.de.elo.mover.utils.ELOAsUtils.getReferencePaths(emConnect, sordId);
+        }
+        catch (ex) {
+            this.logging(true, "Fehler beim Laden der Referenzen von  " + sordId + ".\n" + ex);
+            return undefined;
+        }
+    },
+
+    /**
+    * Gibt alle Referenzen eines Sords über dessen Pfad zurück. Beinhaltet ebenfalls den Pfad auf das ursprüngliche Sord.
+    * @author   Erik Köhler - Weinrich
+    * @param    {String}    path    Pfad des Sords, dessen Referenzen zurückgegeben werden sollen.
+    * @return   {String[]}          Pfade der Referenzen. Gibt undefined bei Fehler zurück.
+    * @example
+    * var sordId = 51977;
+    * var path = weinrich.as.Utils.getArcpathById(sordId);
+    * var referencePaths = weinrich.as.Utils.getReferencePathsByPath(path);
+    */
+    getReferencePathsByPath: function (path) {
+        
+        try {
+            var sord = this.getSordByRelativeArcpath(path);
+            if (sord === undefined) throw "Error loading Sord...";
+             
+            return Packages.de.elo.mover.utils.ELOAsUtils.getReferencePaths(emConnect, sord.id);
+        }
+        catch (ex) {
+            this.logging(true, "Fehler beim Laden der Referenzen von  " + sordId + ".\n" + ex);
+            return undefined;
+        }
+    },
+     
+    /**
+    * Lade das Eltern-Sord über die ObjId eines Sords. Wird das Eltern-Sord einer Referenz gesucht, 
+    * muss zusätzlich die rootId übergeben werden, ab der 
+    * @author   Erik Köhler - Weinrich
+    * @param    {int}    sordId     ObjId des Sords, dessen Eltern-Sord geladen werden soll
+    * @param    {int}    rootId     Nur angeben wenn innerhalb eines Verzeichnisses nach dem Eltern-Sord einer REFERENZ gesucht werden soll 
+    * @return   {Sord}              Eltern-Sord, ansonsten undefined
+    * @example
+    * var rootId = 51977; // ...//Schulung//000 Documents
+    * var path = weinrich.as.Utils.getArcpathById(rootId) + "//xyz//T1_ELO ECM Suite 20 (PPT)";
+    * var sord = weinrich.as.Utils.getSordByRelativeArcpath(path);
+    * var parentRefSord1 = weinrich.as.Utils.getParentSordById(sord.id, rootId);    
+    */
+    getParentSordById: function(sordId, rootId) {
+
+        //Gebe eine rootId an, wenn innerhalb eines Verzeichnisses nach dem Eltern-Sord einer REFERENZ gesucht werden soll
+        if (rootId) {
+
+            try {
+                //Pfad, von dem aus nach Referenzen gesucht werden soll
+                var rootPath = this.getArcpathById(rootId);
+                this.logging(false, "rootPath= " + rootPath);
+                if (rootPath === undefined) throw "Error loading rootPath...";
+
+                //Pfade der Referenzen des Sords
+                var referencePaths = this.getReferencePathsById(sordId);
+                if (referencePaths === undefined) throw "Error loading referencePaths...";
+
+                //Pfad auf eine (ab der rootId) eindeutige Referenz
+                var foundReferencePath = undefined;
+
+                //Gehe alle Referenzen durch und prüfe, ob der Pfad innerhalb des Rootverzeichnisses liegt
+                for (var i = 0; i < referencePaths.length; i++) {
+
+                    this.logging(false, "referencePath" + i + "=" + referencePaths[i]);
+                    
+                    //Prüfe, ob die Referenz innerhalb des Rootverzeichnisses liegt
+                    if (referencePaths[i].contains(rootPath)) {
+                        //Wurde bereits eine Referenz im Rootverzeichnis gefunden, ist das Ergebnis nicht mehr eindeutig
+                        if (foundReferencePath)
+                            throw "Es wurden mehrere Referenzen innerhalb des Rootverzeichnisses gefunden...";
+                        else
+                            foundReferencePath = referencePaths[i];
+                    }
+                }
+
+                if (foundReferencePath) {
+                    var parentSord = this.getSordByArcpath(foundReferencePath);
+                    if (parentSord === undefined) throw "Error loading parent Sord...";
+                }
+                else
+                    throw "Keine Referenz im Rootverzeichnis gefunden...";
+
+                return parentSord;
+            }
+            catch (ex) {
+                this.logging(true, "Fehler beim Laden des Eltern-Sords von " + sordId +
+                    " innerhalb des Verzeichnisses " + rootId + ".\n" + ex);
+                return undefined;
+            }
+        }
+        else {
+            try {
+
+                var sord = this.getSordById(sordId);
+                if (sord === undefined) throw "Error loading Sord...";
+
+                var parentSord = this.getSordById(sord.parentId);
+                if (parentSord === undefined) throw "Error loading parent Sord...";
+
+                return parentSord;
+            }
+            catch (ex) {
+                this.logging(true, "Fehler beim Laden des Eltern-Sords von " + sordId + ".\n" + ex);
+                return undefined;
+            }
+        }      
+    },
+    
+    /**
+    * Lade das Eltern-Sord über die ObjId eines Sords. Wird das Eltern-Sord einer Referenz gesucht, 
+    * muss zusätzlich die rootId übergeben werden, ab der 
+    * @author   Erik Köhler - Weinrich
+    * @param    {String}        path    Pfad des Sords, dessen Eltern-Sord geladen werden soll
+    * @return   {Sord}                  Eltern-Sord, ansonsten undefined
+    * @example
+    * var rootId = 51977; // ...//Schulung//000 Documents
+    * var path = weinrich.as.Utils.getArcpathById(rootId) + "//xyz//T1_ELO ECM Suite 20 (PPT)";
+    * var parentSord = weinrich.as.Utils.getParentSordByPath(path);
+    */
+    getParentSordByPath: function(path) {
+
+         try {
+            
+            var parentPath = this.getParentArcpathByPath(path);
+            if (parentPath === undefined) throw "Error loading parent Path...";
+
+            var parentSord = this.getSordByArcpath(parentPath);
+            if (parentSord === undefined) throw "Error loading parent Sord...";
+
+            return parentSord;
+        }
+        catch (ex) {
+            this.logging(true, "Fehler beim Laden des Eltern-Sords von " + path + ".\n" + ex);
+            return undefined;
+        }
 	},
     
-    // # -----------------------------------------------------
+    // # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 };
 
 /**
  * Funktionen für Zeit und Datum
+ * {@link https://commons.apache.org/proper/commons-io/apidocs/org/apache/commons/io/FileUtils.html FileUtils}
  * @memberof weinrich.as
  * @namespace weinrich.as.DateUtils
  * @type {object}
@@ -857,10 +1457,11 @@ weinrich.as.Utils = {
 weinrich.as.DateUtils = {
 
     /**
-    * Gibt das aktuelle DateTime ohne Zeit zurück 
+    * Gibt das aktuelle DateTime ohne Zeit zurück. Format bei Ausgabe: "Fri Dec 16 00:00:00 CET 2022".
     * @author   Erik Köhler - Weinrich
-    * @return   {Date}  Gibt das aktuelle Datum ohne Uhrzeit zurück. Bei Fehler undefinded
-    * TODO Teste mich
+    * @return   {Date}                  Gibt das aktuelle Datum ohne Uhrzeit zurück. Bei Fehler undefined.
+    * @example
+    * var currentDate = weinrich.as.DateUtils.getCurrentDate();
     */
     getCurrentDate: function () {	
         try {    
@@ -873,87 +1474,398 @@ weinrich.as.DateUtils = {
     },
 
     /**
-    * Gibt das heutige DateTime plus x Minuten zurück. Wähle negativen Wert bei minutes für minus x Tage
+    * Gibt das aktuelle DateTime mit Zeit zurück. Format bei Ausgabe: "Fri Dec 16 01:30:55 CET 2022".
     * @author   Erik Köhler - Weinrich
-    * @return   {Date}  Um x Minuten verschobene Uhrzeit
-    * TODO Teste mich
+    * @return   {Date}                  Gibt das aktuelle Datum mit Uhrzeit zurück. Bei Fehler undefined.
+    * @example
+    * var currentDateTime = weinrich.as.DateUtils.getCurrentDateTime();
     */
-    getDateTimeMinutesLater: function(minutes) {		
-        var cal = Calendar.getInstance(); 
-        cal.add(Calendar.MINUTE, minutes);
-        return cal.getTime();
-    },
-    
-    /**
-    * Gibt das heutige DateTime plus x Stunden zurück. Wähle negativen Wert bei hours für minus x Stunden
-    * @author   Erik Köhler - Weinrich
-    * @return   {Date}  Um x Stunden verschobene Uhrzeit
-    * TODO Teste mich
-    */
-    getDateTimeHoursLater: function(hours) {		
-        var cal = Calendar.getInstance(); 
-        cal.add(Calendar.HOUR, hours);
-        return cal.getTime();
-    },
-    
-    /**
-    * Gibt das heutige DateTime plus x Tage zurück. Wähle negativen Wert bei days für minus x Tage
-    * @author   Erik Köhler - Weinrich
-    * @return   {Date}  Um x Minuten verschobene Uhrzeit
-    * TODO Teste mich
-    */
-    getDateTimeDaysLater: function(days) {		
-        var cal = Calendar.getInstance(); 
-        cal.add(Calendar.DAY, days);
-        return cal.getTime();
+    getCurrentDateTime: function () {	
+        try {    
+		    return Packages.de.elo.mover.utils.ELOAsDateUtils.getToday();	
+        }
+        catch (ex) {
+            weinrich.as.Utils.logging(true, "Fehler beim Laden des aktuellen Datums.\n" + ex);
+            return undefined;
+        }
     },
 
     /**
-    * Gibt das heutige DateTime plus x Monate zurück. Wähle negativen Wert bei months für minus x Monate
+    * Formatiert das übergebene Datum in das deutsche Datumsformat (z.B.: 24.12.2022)
     * @author   Erik Köhler - Weinrich
-    * @return   {Date}  Um x Monate verschobene Uhrzeit
-    * TODO Teste mich
+    * @param    {Date}      date    Zu formatierendes DateTime
+    * @return   {String}            Formatiertes Datum
+    * @example
+    * var currentDate = weinrich.as.DateUtils.getCurrentDate();
+    * var formattedDate = weinrich.as.DateUtils.getFormattedDate(currentDate);
     */
-    getDateTimeMonthsLater: function(months) {		
-        var cal = Calendar.getInstance(); 
-        cal.add(Calendar.MONTH, months);
-        return cal.getTime();
+    getFormattedDate: function (date) {	
+        try {
+            var calendar = Calendar.getInstance(); 
+            calendar.setTime(date);
+
+            var day = calendar.get(Calendar.DAY_OF_MONTH);
+            var month = calendar.get(Calendar.MONTH) + 1;
+            var year = calendar.get(Calendar.YEAR);
+
+            var dateString = ('0' + day).slice(-2) + '.'
+                + ('0' + month).slice(-2) + '.'
+                + ('000' + year).slice(-4);
+
+            return dateString;
+        }
+        catch (ex) {
+            weinrich.as.Utils.logging(true, "Fehler beim formatieren des Datums.\n" + ex);
+            return undefined;
+        }
     },
 
     /**
-    * Gibt das heutige DateTime plus x Jahre zurück. Wähle negativen Wert bei years für minus x Jahre
+    * Formatiert die übergebene Zeit in das deutsche Zeitformat (z.B.: 02:30:00 2 Uhr 30 Minuten 0 Sekunden)
     * @author   Erik Köhler - Weinrich
-    * @return   {Date}  Um x Jahre verschobene Uhrzeit
-    * TODO Teste mich
+    * @param    {Date}      date    Zu formatierendes DateTime
+    * @return   {String}            Formatierte Zeit
+    * @example
+    * var currentDate = weinrich.as.DateUtils.getCurrentDate();
+    * var formattedTime = weinrich.as.DateUtils.getFormattedTime(currentDate);
     */
-    getDateTimeYearsLater: function(years) {		
-        var cal = Calendar.getInstance(); 
-        cal.add(Calendar.YEAR, years);
-        return cal.getTime();
+    getFormattedTime: function (date) {	
+
+        try {   		
+            var calendar = Calendar.getInstance(); 
+            calendar.setTime(date);
+
+            var seconds = calendar.get(Calendar.SECOND);
+            var minutes = calendar.get(Calendar.MINUTE);
+            var hours = calendar.get(Calendar.HOUR);
+
+            var dateString = ('0' + hours).slice(-2) + ':'
+                + ('0' + minutes).slice(-2) + ':'
+                + ('0' + seconds).slice(-2);
+
+            return dateString;
+        }
+        catch (ex) {
+            weinrich.as.Utils.logging(true, "Fehler beim formatieren der Uhrzeit.\n" + ex);
+            return undefined;
+        }
+    },
+     
+    /**
+    * Formatiert das übergebene Datum in das deutsche Datumsformat (z.B.: 24.12.2022)
+    * @author   Erik Köhler - Weinrich
+    * @param    {Date}      date    Zu formatierendes Datum
+    * @return   {String}            Formatiertes Datum
+    * @example
+    * var currentDate = weinrich.as.DateUtils.getCurrentDate();
+    * var formattedDateTime = weinrich.as.DateUtils.getFormattedDateTime(currentDate);
+    */
+    getFormattedDateTime: function (date) {	
+        try {   
+            
+            return (this.getFormattedTime(date) + " " + this.getFormattedDate(date));
+        }
+        catch (ex) {
+            weinrich.as.Utils.logging(true, "Fehler beim formatieren der Uhrzeit mit Datum.\n" + ex);
+            return undefined;
+        }
+    },
+
+    /**
+    * Ändert den Wert des DateTimes zu einem reinem Datum ohne Uhrzeit (Uhrzeit ist dann 00:00:00 Uhr). 
+    * @author   Erik Köhler - Weinrich
+    * @param    {Date}      date    Zu formatierendes DateTime
+    * @return   {String}            Formatiertes Datum
+    * @example
+    * var currentDateTime = weinrich.as.DateUtils.getCurrentDateTime();
+    * var currentDate = weinrich.as.DateUtils.getOnlyDateFromDateTime(currentDateTime);
+    */
+    getOnlyDateFromDateTime: function (date) {	
+        try {
+            var calendar = Calendar.getInstance(); 
+            calendar.setTime(date);
+
+            var day = calendar.get(Calendar.DAY_OF_MONTH);
+            var month = calendar.get(Calendar.MONTH) + 1;
+            var year = calendar.get(Calendar.YEAR);
+            
+            var onlyDate = new Date(year, month, day);            
+            calendar.setTime(onlyDate);
+
+            return calendar.getTime();
+        }
+        catch (ex) {
+            weinrich.as.Utils.logging(true, "Fehler beim Umwandeln des DateTimes zu einem reinen Datum.\n" + ex);
+            return undefined;
+        }
+    },
+
+    /**
+    * (DO NOT USE) Rechnet Zeit auf das übergebene DateTime.
+    * @author   Erik Köhler - Weinrich
+    * @param    {Date}      date        DateTime als Ausgangswert
+    * @param    {int}       timeEntity  Draufzurechnende Zeiteinheit (z.B. Anzahl zu addierender Minuten)
+    * @return   {Date}                  DateTime mit aufaddierter Zeit
+    */
+    addTimeToDateTime: function(date, timeEntity, timetype) {		
+        var calendar = Calendar.getInstance(); 
+        calendar.setTime(date);
+        calendar.add(timetype, timeEntity);
+        return calendar.getTime();
+    },
+    
+    /**
+    * Rechnet die Anzahl Sekunden auf das übergebene DateTime. Wähle negativen Wert bei seconds für minus x Sekunden
+    * @author   Erik Köhler - Weinrich
+    * @param    {Date}      date        DateTime als Ausgangswert
+    * @param    {int}       seconds     Anzahl zu addierender Sekunden
+    * @return   {Date}                  DateTime mit aufaddierten Sekunden
+    * @example
+    * var now = weinrich.as.DateUtils.getCurrentDate();
+    * var newDate = weinrich.as.DateUtils.addSecondsToDateTime(now, 10);
+    */
+    addSecondsToDateTime: function (date, seconds) {	
+        return this.addTimeToDateTime(date, seconds, Calendar.SECOND);
+    },
+
+    /**
+    * Gibt das jetzige DateTime plus x Sekunden zurück. Wähle negativen Wert bei seconds für minus x Sekunden
+    * @author   Erik Köhler - Weinrich
+    * @param    {int}       seconds     Anzahl zu addierender Sekunden
+    * @return   {Date}                  Um x Sekunden verschobene jetziges DateTime
+    */
+    addSecondsToNow: function(seconds) {		
+        var cal = Calendar.getInstance();
+        return this.addSecondsToDateTime(cal.getTime(), seconds);
+    }, 
+
+    /**
+    * Rechnet die Anzahl Minuten auf das übergebene DateTime. Wähle negativen Wert bei minutes für minus x Minuten
+    * @author   Erik Köhler - Weinrich
+    * @param    {Date}      date        DateTime als Ausgangswert
+    * @param    {int}       minutes     Anzahl zu addierender Minuten
+    * @return   {Date}                  DateTime mit aufaddierten Minuten
+    * @example
+    * var now = weinrich.as.DateUtils.getCurrentDate();
+    * var newDate = weinrich.as.DateUtils.addMinutesToDateTime(now, 10);
+    */
+    addMinutesToDateTime: function (date, minutes) {	
+        return this.addTimeToDateTime(date, minutes, Calendar.MINUTE);
+    },
+
+    /**
+    * Gibt das jetzige DateTime plus x Minuten zurück. Wähle negativen Wert bei minutes für minus x Minuten
+    * @author   Erik Köhler - Weinrich
+    * @param    {int}       minutes     Anzahl zu addierender Minuten
+    * @return   {Date}                  Um x Minuten verschobene jetziges DateTime
+    */
+    addMinutesToNow: function(minutes) {		
+        var cal = Calendar.getInstance();
+        return this.addMinutesToDateTime(cal.getTime(), minutes);
+    },    
+
+    /**
+    * Rechnet die Anzahl Stunden auf das übergebene DateTime. Wähle negativen Wert bei hours für minus x Stunden
+    * @author   Erik Köhler - Weinrich
+    * @param    {Date}      date        DateTime als Ausgangswert
+    * @param    {int}       hours       Anzahl zu addierender Stunden
+    * @return   {Date}                  DateTime mit aufaddierten Stunden
+    * @example
+    * var now = weinrich.as.DateUtils.getCurrentDate();
+    * var newDate = weinrich.as.DateUtils.addHoursToDateTime(now, 10);
+    */
+    addHoursToDateTime: function(date, hours) {	
+        return this.addTimeToDateTime(date, hours, Calendar.HOUR);
+    },
+
+    /**
+    * Gibt das jetzige DateTime plus x Stunden zurück. Wähle negativen Wert bei hours für minus x Stunden
+    * @author   Erik Köhler - Weinrich
+    * @param    {int}       hours     Anzahl zu addierender Stunden
+    * @return   {Date}                  Um x Stunden verschobene jetziges DateTime
+    */
+    addHoursToNow: function(hours) {		
+        var cal = Calendar.getInstance();
+        return this.addHoursToDateTime(cal.getTime(), hours);
+    },    
+
+    /**
+    * Rechnet die Anzahl Tage auf das übergebene DateTime. Wähle negativen Wert bei days für minus x Tage
+    * @author   Erik Köhler - Weinrich
+    * @param    {Date}      date        DateTime als Ausgangswert
+    * @param    {int}       days        Anzahl zu addierender Tage
+    * @return   {Date}                  DateTime mit aufaddierten Tage
+    * @example
+    * var now = weinrich.as.DateUtils.getCurrentDate();
+    * var newDate = weinrich.as.DateUtils.addDaysToDateTime(now, 10);
+    */
+    addDaysToDateTime: function(date, days) {	
+        return this.addTimeToDateTime(date, days, Calendar.DAY_OF_MONTH);
+    },
+
+    /**
+    * Gibt das jetzige DateTime plus x Tage zurück. Wähle negativen Wert bei days für minus x Tage
+    * @author   Erik Köhler - Weinrich
+    * @param    {int}       days    Anzahl zu addierender Tage
+    * @return   {Date}              Um x Tage verschobene jetziges DateTime
+    */
+    addDaysToNow: function(days) {		
+        var cal = Calendar.getInstance();
+        return this.addDaysToDateTime(cal.getTime(), days);
+    },       
+
+    /**
+    * Rechnet die Anzahl Wochen auf das übergebene DateTime. Wähle negativen Wert bei weeks für minus x Wochen
+    * @author   Erik Köhler - Weinrich
+    * @param    {Date}      date        DateTime als Ausgangswert
+    * @param    {int}       weeks       Anzahl zu addierender Wochen
+    * @return   {Date}                  DateTime mit aufaddierten Wochen
+    * @example
+    * var now = weinrich.as.DateUtils.getCurrentDate();
+    * var newDate = weinrich.as.DateUtils.addWeeksToDateTime(now, 10);
+    */
+    addWeeksToDateTime: function(date, weeks) {	
+        return this.addTimeToDateTime(date, (weeks*7), Calendar.DAY_OF_MONTH);
+    },
+
+    /**
+    * Gibt das jetzige DateTime plus x Wochen zurück. Wähle negativen Wert bei weeks für minus x Wochen
+    * @author   Erik Köhler - Weinrich
+    * @param    {int}       weeks    Anzahl zu addierender Wochen
+    * @return   {Date}              Um x Wochen verschobene jetziges DateTime
+    */
+    addWeeksToNow: function(weeks) {		
+        var cal = Calendar.getInstance();
+        return this.addDaysToDateTime(cal.getTime(), (weeks*7));
+    },    
+
+    /**
+    * Rechnet die Anzahl Monate auf das übergebene DateTime. Wähle negativen Wert bei months für minus x Monate
+    * @author   Erik Köhler - Weinrich
+    * @param    {Date}      date        DateTime als Ausgangswert
+    * @param    {int}       months      Anzahl zu addierender Monate
+    * @return   {Date}                  DateTime mit aufaddierten Monate
+    * @example
+    * var now = weinrich.as.DateUtils.getCurrentDate();
+    * var newDate = weinrich.as.DateUtils.addMonthsToDateTime(now, 10);
+    */
+    addMonthsToDateTime: function(date, months) {	
+        return this.addTimeToDateTime(date, months, Calendar.MONTH);
+    },
+
+    /**
+    * Gibt das jetzige DateTime plus x Monate zurück. Wähle negativen Wert bei months für minus x Monate
+    * @author   Erik Köhler - Weinrich
+    * @param    {int}       months  Anzahl zu addierender Monate
+    * @return   {Date}              Um x Monate verschobene jetziges DateTime
+    */
+    addMonthsToNow: function(months) {		
+        var cal = Calendar.getInstance();
+        return this.addMonthsToDateTime(cal.getTime(), months);
+    },   
+
+    /**
+    * Rechnet die Anzahl Jahre auf das übergebene DateTime. Wähle negativen Wert bei years für minus x Jahre
+    * @author   Erik Köhler - Weinrich
+    * @param    {Date}      date        DateTime als Ausgangswert
+    * @param    {int}       years       Anzahl zu addierender Jahre
+    * @return   {Date}                  DateTime mit aufaddierten Jahre
+    * @example
+    * var now = weinrich.as.DateUtils.getCurrentDate();
+    * var newDate = weinrich.as.DateUtils.addYearsToDateTime(now, 10);
+    */
+    addYearsToDateTime: function(date, years) {	
+        return this.addTimeToDateTime(date, years, Calendar.YEAR);
+    },
+
+    /**
+    * Gibt das jetzige DateTime plus x Jahre zurück. Wähle negativen Wert bei years für minus x Jahre
+    * @author   Erik Köhler - Weinrich
+    * @param    {int}       years   Anzahl zu addierender Jahre
+    * @return   {Date}              Um x Jahre verschobene jetziges DateTime
+    */
+    addYearsToNow: function(years) {		
+        var cal = Calendar.getInstance();
+        return this.addYearsToDateTime(cal.getTime(), years);
     },
 
     /**
     * Gibt zurück, ob das erste Datum nach dem zweiten Datum liegt
     * @author   Erik Köhler - Weinrich
     * @return   {bool}  True, wenn erstes Datum nach dem zweiten Datum. Bsp.: 01.01.2000 > 01.01.1990 => true
-    * TODO Teste mich
     */
-    dateIsLater: function (firstDate, secondDate) {	
+    dateIsAfter: function (firstDate, secondDate) {	
         try {
-            return Packages.de.elo.mover.utils.ELOAsDateUtils.isNewerThan(firstDate, secondDate);
+            var date1 = this.getOnlyDateFromDateTime(firstDate);
+            var date2 = this.getOnlyDateFromDateTime(secondDate);
+
+            return (date1 > date2);
         }
         catch (ex) {
             weinrich.as.Utils.logging(true, "Fehler bei der Prüfung, ob ein Datum nach dem anderen liegt.\n" + ex);
             return undefined;
         }	
-    },    
+    },
 
     /**
-    * Ändere ausgeschriebenen Monat in Monatsnummer
+    * Gibt zurück, ob das erste Datum nach dem zweiten Datum liegt
+    * @author   Erik Köhler - Weinrich
+    * @return   {bool}  True, wenn erstes Datum nach dem zweiten Datum. Bsp.: 01.01.2000 > 01.01.1990 => true
+    */
+    dateIsEqualOrAfter: function (firstDate, secondDate) {	
+        try {
+            var date1 = this.getOnlyDateFromDateTime(firstDate);
+            var date2 = this.getOnlyDateFromDateTime(secondDate);
+
+            return (date1 >= date2);
+        }
+        catch (ex) {
+            weinrich.as.Utils.logging(true, "Fehler bei der Prüfung, ob ein Datum nach dem anderen liegt.\n" + ex);
+            return undefined;
+        }	
+    },
+
+    /**
+    * Gibt zurück, ob das erste Datum nach dem zweiten Datum liegt
+    * @author   Erik Köhler - Weinrich
+    * @return   {bool}  True, wenn erstes Datum nach dem zweiten Datum. Bsp.: 01.01.2000 > 01.01.1990 => true
+    */
+    dateIsBefore: function (firstDate, secondDate) {	
+        try {
+            var date1 = this.getOnlyDateFromDateTime(firstDate);
+            var date2 = this.getOnlyDateFromDateTime(secondDate);
+
+            return (date1 < date2);
+        }
+        catch (ex) {
+            weinrich.as.Utils.logging(true, "Fehler bei der Prüfung, ob ein Datum vor dem anderen liegt.\n" + ex);
+            return undefined;
+        }	
+    },
+    
+    /**
+    * Gibt zurück, ob das erste Datum nach dem zweiten Datum liegt
+    * @author   Erik Köhler - Weinrich
+    * @return   {bool}  True, wenn erstes Datum nach dem zweiten Datum. Bsp.: 01.01.2000 > 01.01.1990 => true
+    */
+    dateIsEqualOrBefore: function (firstDate, secondDate) {	
+        try {
+            var date1 = this.getOnlyDateFromDateTime(firstDate);
+            var date2 = this.getOnlyDateFromDateTime(secondDate);
+
+            return (date1 <= date2);
+        }
+        catch (ex) {
+            weinrich.as.Utils.logging(true, "Fehler bei der Prüfung, ob ein Datum vor dem anderen liegt.\n" + ex);
+            return undefined;
+        }	
+    },
+
+    /**
+    * Ändere ausgeschriebenen Monat in Monatsnummer.
     * @author   Erik Köhler - Weinrich
     * @param    {String}    month   Ausgeschriebener Monat. Beispiel: "Februar"
     * @return   {String}            Monatsnummer als String. Beispiel: "Januar" -> "01"  
-    * TODO Teste mich
     */
 	changeMonthToMonthNumber: function (month) {
 		var monthNumber = "";
@@ -1016,7 +1928,7 @@ weinrich.as.FileUtils = {
     * @memberof weinrich.as.FileUtils
     * @method   isDirectory
     * @param    {File}   file   Pfad für die Datei/den Ordner, der zu prüfen ist
-    * @return   {bool}          True wenn Verzeichnis
+    * @return   {bool}          True wenn Verzeichnis das File ein Verzeichnis ist
     */
     isDirectory: function (file) {
         
@@ -1029,7 +1941,7 @@ weinrich.as.FileUtils = {
     * @memberof weinrich.as.FileUtils
     * @method   isFile
     * @param    {File}   file   Pfad für die Datei/den Ordner, der zu prüfen ist
-    * @return   {bool}          True wenn Datei
+    * @return   {bool}          True wenn das File eine Datei ist
     */
     isFile: function (file) {
         
@@ -1054,15 +1966,18 @@ weinrich.as.FileUtils = {
     copyFileToDir: function (srcFile, destDir, overwrite) {        
         try {
 
+            //Prüfe, ob die zu kopierende Datei existiert
             if (!this.fileOrDirectoryExists(srcFile)) {
                 weinrich.as.Utils.logging(true, "Fehler beim Kopieren der Datei. Datei nicht gefunden.");
                 return false;
             }
-                
+
+            //Prüfe, ob die Datei im Zielpfad überschrieben werden soll    
             if (overwrite) {
                 FileUtils.deleteQuietly(new File(destDir.getPath() + "\\" + srcFile.getName()));
             }
 
+            //Kopiere Datei ins Zielverzeichnis
             FileUtils.copyFileToDirectory(srcFile, destDir);
 
             return true;
@@ -1091,16 +2006,18 @@ weinrich.as.FileUtils = {
     moveFileToDir: function (srcFile, destDir, overwrite) {        
         try {
 
+            //Pruefe, ob zu Verschiebende Datei existiert
             if (!this.fileOrDirectoryExists(srcFile)) {
                 weinrich.as.Utils.logging(true, "Fehler beim Verschieben der Datei. Datei nicht gefunden.");
                 return false;
             }
 
+            //Wenn überschrieben werden soll, wird die Datei im Zielpfad zunächst gelöscht
             if (overwrite) {
                 FileUtils.deleteQuietly(new File(destDir.getPath() + "\\" + srcFile.getName()));
             }
 
-            //Legt Verzeichnis an, falls es nicht existiert
+            //Verschiebt Datei ins Zielverzeichnis. Legt Verzeichnis an, falls es nicht existiert
             FileUtils.moveToDirectory(srcFile, destDir, true);
 
             return true;
@@ -1110,5 +2027,4 @@ weinrich.as.FileUtils = {
             return false;
         }
     },
-
 };
