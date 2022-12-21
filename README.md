@@ -9,7 +9,9 @@ Integrierte Funktionen:
 3. Funktionen für ELO
 4. Logging
 
-Damit die Bibliothek lauffähig ist, müssen folgende ELO-Bibliotheken included werden:
+# Einbindung in eine AS-Regel
+
+Damit die Bibliothek lauffähig ist, müssen folgende ELO-Bibliotheken inkludiert werden:
 
 - lib_Class
 - ix: IndexServer Functions
@@ -19,12 +21,15 @@ Und natürlich die Bibliothek selber:
 
 - <a href="https://ekweinrich.github.io/Weinrich-Library/lib_weinrich.as.js.html">lib_weinrich.as</a>
 
-Um zu loggen:
+# Logging
 
-Init log (nur 1 mal am Anfang)
-weinrich.as.Utils.initLogging(true, "TestRule");
-weinrich.as.Utils.logging(false, "TEST-LOG");
+Initialisiere die Log-Funktion 1 mal initial am Anfang der Regel:
+weinrich.as.Utils.initLogging(true, "NameDerAS-Regel");
+True/False stehen hier für Debug-Modus. Bei True wird immer ein Logeintrag geschrieben. Bei False nur, falls man später einen Prioritätslog verwendet.
 
+Danach kann folgendermaßen geloggt werden:
+weinrich.as.Utils.logging(false, "Dies ist ein Dummy-Logeintrag");
+True/False stehen hier für Prioritätslog. Bei True wird immer ein Logeintrag geschrieben, auch wenn man nicht im Debug-Modus ist.
 
 
 Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="https://github.com/ekWeinrich/Weinrich-Library/issues">hier</a> 
