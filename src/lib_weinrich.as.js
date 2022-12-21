@@ -12,7 +12,7 @@ weinrich.as = {};
  * @memberof weinrich.as
  * @namespace weinrich.as.Utils
  * @type {object}
- * @version 0.0.1 norelease
+ * @version release 1.0.0 
  */
 weinrich.as.Utils = {
 
@@ -1234,6 +1234,7 @@ weinrich.as.Utils = {
  * @memberof weinrich.as
  * @namespace weinrich.as.FilterUtils
  * @type {object}
+ * @version release 1.0.0 
  */
  weinrich.as.FilterUtils = {
      
@@ -1559,6 +1560,7 @@ weinrich.as.Utils = {
  * @memberof weinrich.as
  * @namespace weinrich.as.DateUtils
  * @type {object}
+ * @version release 1.0.0 
  */
 weinrich.as.DateUtils = {
 
@@ -2012,6 +2014,7 @@ weinrich.as.DateUtils = {
  * @memberof weinrich.as
  * @namespace weinrich.as.FileUtils
  * @type {object}
+ * @version release 1.0.0 
  */
 weinrich.as.FileUtils = {
      
