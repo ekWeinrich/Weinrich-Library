@@ -1555,8 +1555,8 @@ weinrich.as.Utils = {
 
 /**
  * Funktionen für Zeit und Datum. Nutzt u.a. Funktionen von:  
- * - {@link https://docs.oracle.com/javase/8/docs/api/java/util/Date.html java/util/Date}
- * - {@link https://docs.oracle.com/javase/7/docs/api/java/util/Calendar.html java/util/Calendar}
+ * - {@link https://docs.oracle.com/javase/8/docs/api/java/util/Date.html Date}
+ * - {@link https://docs.oracle.com/javase/7/docs/api/java/util/Calendar.html Calendar}
  * @memberof weinrich.as
  * @namespace weinrich.as.DateUtils
  * @type {object}
