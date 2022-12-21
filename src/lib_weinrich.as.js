@@ -1818,7 +1818,6 @@ weinrich.as.FileUtils = {
  */
  weinrich.as.FilterUtils = {
      
-
     /**
     * Filtert die übergebene ArrayList nach Sords, dessen Kurzbezeichnung den Filterwert enthält.
     * @author   Erik Köhler - Weinrich
@@ -2036,9 +2035,9 @@ weinrich.as.FileUtils = {
         }
 
         return sordArrList;
-     },
+    },
     
-     /**
+    /**
     * Filtert die übergebene ArrayList. Prüft, ob das Mapfeld einen Wert beinhaltet.
     * @author   Erik Köhler - Weinrich
     * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)
@@ -2050,7 +2049,7 @@ weinrich.as.FileUtils = {
     * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
     * var filteredArrayList = weinrich.as.Utils.filterArrayListMapfieldContains(childSords, "EUR", "CONTRACT_BASE_CURRENCY_CODE");
     */
-      filterArrayListMapfieldContains: function(sordArrList, filterValue, fieldToFilterWith) {
+    filterArrayListMapfieldContains: function(sordArrList, filterValue, fieldToFilterWith) {
 
         //Erstelle einen Iterator für die ArrayList mit Sords
         var iterator = sordArrList.iterator();
