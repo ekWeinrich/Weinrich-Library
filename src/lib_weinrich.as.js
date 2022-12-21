@@ -1228,9 +1228,334 @@ weinrich.as.Utils = {
     // # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 };
 
+
 /**
- * Funktionen für Zeit und Datum
- * {@link https://commons.apache.org/proper/commons-io/apidocs/org/apache/commons/io/FileUtils.html FileUtils}
+ * Funktionen um das Filtern zu vereinfachen
+ * @memberof weinrich.as
+ * @namespace weinrich.as.FilterUtils
+ * @type {object}
+ */
+ weinrich.as.FilterUtils = {
+     
+    /**
+    * Filtert die übergebene ArrayList nach Sords, dessen Kurzbezeichnung den Filterwert enthält.
+    * @author   Erik Köhler - Weinrich
+    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)
+    * @param    {String}                    filterValue            Wert, nach dem gefiltert wird
+    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
+    * @example
+    * var sord = weinrich.as.Utils.getSordById(43532);        
+    * var childSords = weinrich.as.Utils.getChildSordsById(sord.id);
+    * var filteredArrayList = weinrich.as.Utils.filterArrayListByNameContains(childSords, "Mietvertrag");
+    */
+    filterArrayListByNameContains: function(sordArrList, filterValue) {
+
+        //Erstelle einen Iterator für die ArrayList mit Sords
+        var iterator = sordArrList.iterator();
+
+        //Iteriere durch alle Elemente
+         while (iterator.hasNext()) {   
+            
+            var sordArrListValue = iterator.next().name;    
+
+            //Prüfe, ob der String, nach dem gefiltert werden soll, in der Kurzbezeichnung existiert
+            if (!sordArrListValue.contains(filterValue)) {
+                //Entferne bei Sord aus der ArrayList
+                iterator.remove();
+            }
+        }
+
+        return sordArrList;
+    },
+
+    /**
+    * Filtert die übergebene ArrayList nach Sords, dessen Kurzbezeichnung dem Filterwert entspricht.
+    * @author   Erik Köhler - Weinrich
+    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)
+    * @param    {String}                    filterValue            Wert, nach dem gefiltert wird
+    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
+    * @example
+    * var sord = weinrich.as.Utils.getSordById(43532);        
+    * var childSords = weinrich.as.Utils.getChildSordsById(sord.id);
+    * var filteredArrayList = weinrich.as.Utils.filterArrayListByNameEquals(childSords, "C000033 Mietvertrag");
+    */
+    filterArrayListByNameEquals: function(sordArrList, filterValue) {
+
+        //Erstelle einen Iterator für die ArrayList mit Sords
+        var iterator = sordArrList.iterator();
+
+        //Iteriere durch alle Elemente
+         while (iterator.hasNext()) {   
+            
+            var sordArrListValue = iterator.next().name;    
+
+            //Prüfe, ob der String, nach dem gefiltert werden soll, in der Kurzbezeichnung existiert
+            if (sordArrListValue != filterValue) {
+                //Entferne bei Sord aus der ArrayList
+                iterator.remove();
+            }
+        }
+
+        return sordArrList;
+    },
+
+    /**
+    * Filtert die übergebene ArrayList nach Sords, dessen Kurzbezeichnung dem Regex entsprechen.
+    * @author   Erik Köhler - Weinrich
+    * @param    {java.util.ArrayList<Sord>} sordArrList         Zu filternde ArrayList (Java)
+    * @param    {String}                    regex               Regex für die Kurzbezeichnung
+    * @return   {java.util.ArrayList<Sord>}                     Gefilterte Arraylist
+    * @example
+    * var regEx = "(C[0-9]{6})";
+    * var sord = weinrich.as.Utils.getSordById(43532);        
+    * var childSords = weinrich.as.Utils.getChildSordsById(sord.id);
+    * var filteredArrayList = weinrich.as.Utils.filterArrayListByNameRegex(childSords, regEx);
+    */
+    filterArrayListByNameRegex: function(sordArrList, regex) {
+
+        //Erstelle einen Iterator für die ArrayList mit Sords
+        var iterator = sordArrList.iterator();
+
+        //Iteriere durch alle Elemente
+        while (iterator.hasNext()) {   
+            
+            var sordArrListValue = iterator.next().name;  
+
+            //Prüfe, ob der Kurzbezeichnung dem Regex entspricht
+            if (sordArrListValue.search(regex) == -1) {
+                //Entferne Sord aus der ArrayList
+                iterator.remove();
+            }
+        }
+
+        return sordArrList;
+    },
+
+    /**
+    * Filtert die übergebene ArrayList nach Sords mit der uebergebenen Maske
+    * @author   Erik Köhler - Weinrich
+    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)
+    * @param    {String}                    filterValue            Maske, nach der gefiltert wird
+    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist                   Gefilterte Arraylist
+    * @example
+    * var sord = weinrich.as.Utils.getSordById(43532);
+    * var contractSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
+    */
+    filterArrayListByMask: function(sordArrList, maskname) {
+
+        //Erstelle einen Iterator für die ArrayList mit Sords
+        var iterator = sordArrList.iterator();
+
+        //Iteriere durch alle Elemente
+         while (iterator.hasNext()) {   
+            
+            var sordArrListValue = iterator.next().maskName;    
+
+            //Prüfe, ob der String, nach dem gefiltert werden soll, in der Kurzbezeichnung existiert
+            if (!sordArrListValue.contains(maskname)) {
+                //Entferne bei Sord aus der ArrayList
+                iterator.remove();
+            }
+        }
+
+        return sordArrList;
+    },
+
+    /**
+    * Filtert die übergebene ArrayList. Prüft, ob das Indexfeld einen Wert beinhaltet.
+    * @author   Erik Köhler - Weinrich
+    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)
+    * @param    {String}                    filterValue            Wert, nach dem gefiltert wird
+    * @param    {String}                    fieldToFilterWith      Name des Indexfeldes
+    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
+    * @example
+    * var sord = weinrich.as.Utils.getSordById(43532);
+    * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
+    * var filteredArrayList = weinrich.as.Utils.filterArrayListIndexfieldContains(childSords, "Mietvertrag", "CONTRACT_NAME");
+    */
+    filterArrayListIndexfieldContains: function(sordArrList, filterValue, fieldToFilterWith) {
+
+        //Erstelle einen Iterator für die ArrayList mit Sords
+        var iterator = sordArrList.iterator();
+
+        //Iteriere durch alle Elemente
+        while (iterator.hasNext()) {            
+            
+            var sordArrListValue = this.getIndexfieldValueByName(iterator.next().id, fieldToFilterWith);
+
+            //Prüfe, ob der String, nach dem gefiltert werden soll, im Indexfeld existiert
+            if (!sordArrListValue.contains(filterValue)) {
+                //Entferne bei Sord aus der ArrayList
+                iterator.remove();
+            }
+        }
+
+        return sordArrList;
+    },
+
+    /**
+    * Filtert die übergebene ArrayList. Prüft, ob das Indexfeld gleich einem Wert ist.
+    * @author   Erik Köhler - Weinrich
+    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)
+    * @param    {String}                    filterValue            Wert, nach dem gefiltert wird
+    * @param    {String}                    fieldToFilterWith      Name des Indexfeldes
+    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
+    * @example
+    * var sord = weinrich.as.Utils.getSordById(43532);
+    * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
+    * var filteredArrayList = weinrich.as.Utils.filterArrayListIndexfieldEquals(childSords,  "Mietverträge Seniorenwohnanlagen", "CONTRACT_TYPE");
+    */
+    filterArrayListIndexfieldEquals: function(sordArrList, filterValue, fieldToFilterWith) {
+
+        //Erstelle einen Iterator für die ArrayList mit Sords
+        var iterator = sordArrList.iterator();
+
+        //Iteriere durch alle Elemente
+        while (iterator.hasNext()) {            
+            
+            var sordArrListValue = this.getIndexfieldValueByName(iterator.next().id, fieldToFilterWith);
+
+            if (sordArrListValue != filterValue) {
+                //Entferne bei Sord aus der ArrayList
+                iterator.remove();
+            }
+        }
+
+        return sordArrList;
+    },
+
+    /**
+    * Filtert die übergebene ArrayList. Prüft, ob das Indexfeld gleich Regex entspricht.
+    * @author   Erik Köhler - Weinrich
+    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)
+    * @param    {String}                    filterValue            Wert, nach dem gefiltert wird
+    * @param    {String}                    fieldToFilterWith      Name des Indexfeldes
+    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
+    * @example
+    * var regEx = "(C[0-9]{6})";
+    * var sord = weinrich.as.Utils.getSordById(43532);
+    * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
+    * var filteredArrayList = weinrich.as.Utils.filterArrayListIndexfieldRegex(childSords, regEx, "CONTRACT_NAME");
+    */
+    filterArrayListIndexfieldRegex: function(sordArrList, filterValue, fieldToFilterWith) {
+
+        //Erstelle einen Iterator für die ArrayList mit Sords
+        var iterator = sordArrList.iterator();
+
+        //Iteriere durch alle Elemente
+        while (iterator.hasNext()) {            
+            
+            var sordArrListValue = this.getIndexfieldValueByName(iterator.next().id, fieldToFilterWith);
+
+            if (sordArrListValue.search(filterValue) == -1) {
+                //Entferne bei Sord aus der ArrayList
+                iterator.remove();
+            }
+        }
+
+        return sordArrList;
+    },
+    
+    /**
+    * Filtert die übergebene ArrayList. Prüft, ob das Mapfeld einen Wert beinhaltet.
+    * @author   Erik Köhler - Weinrich
+    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)
+    * @param    {String}                    filterValue            Wert, nach dem gefiltert wird
+    * @param    {String}                    fieldToFilterWith      Name des Mapfeldes
+    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
+    * @example
+    * var sord = weinrich.as.Utils.getSordById(43532);
+    * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
+    * var filteredArrayList = weinrich.as.Utils.filterArrayListMapfieldContains(childSords, "EUR", "CONTRACT_BASE_CURRENCY_CODE");
+    */
+    filterArrayListMapfieldContains: function(sordArrList, filterValue, fieldToFilterWith) {
+
+        //Erstelle einen Iterator für die ArrayList mit Sords
+        var iterator = sordArrList.iterator();
+
+        //Iteriere durch alle Elemente
+        while (iterator.hasNext()) {            
+            
+            var sordArrListValue = this.getMapValue(iterator.next().id, fieldToFilterWith);
+
+            //Prüfe, ob der String, nach dem gefiltert werden soll, im Indexfeld existiert
+            if (!sordArrListValue.contains(filterValue)) {
+                //Entferne bei Sord aus der ArrayList
+                iterator.remove();
+            }
+        }
+
+        return sordArrList;
+    },
+
+    /**
+    * Filtert die übergebene ArrayList. Prüft, ob das Mapfeld gleich einem Wert ist.
+    * @author   Erik Köhler - Weinrich
+    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)
+    * @param    {String}                    filterValue            Wert, nach dem gefiltert wird
+    * @param    {String}                    fieldToFilterWith      Name des Mapfeldes
+    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
+    * @example
+    * var sord = weinrich.as.Utils.getSordById(43532);
+    * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
+    * var filteredArrayList = weinrich.as.Utils.filterArrayListMapfieldEquals(childSords, "EUR", "CONTRACT_BASE_CURRENCY_CODE");
+    */
+    filterArrayListMapfieldEquals: function(sordArrList, filterValue, fieldToFilterWith) {
+
+        //Erstelle einen Iterator für die ArrayList mit Sords
+        var iterator = sordArrList.iterator();
+
+        //Iteriere durch alle Elemente
+        while (iterator.hasNext()) {            
+            
+            var sordArrListValue = this.getMapValue(iterator.next().id, fieldToFilterWith);
+
+            if (sordArrListValue != filterValue) {
+                //Entferne bei Sord aus der ArrayList
+                iterator.remove();
+            }
+        }
+
+        return sordArrList;
+    },
+
+    /**
+    * Filtert die übergebene ArrayList. Prüft, ob das Mapfeld gleich Regex entspricht.
+    * @author   Erik Köhler - Weinrich
+    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)
+    * @param    {String}                    filterValue            Wert, nach dem gefiltert wird
+    * @param    {String}                    fieldToFilterWith      Name des Mapfeldes
+    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
+    * @example
+    * var regEx = "([0-9])";
+    * var sord = weinrich.as.Utils.getSordById(43532);
+    * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
+    * var filteredArrayList = weinrich.as.Utils.filterArrayListMapfieldRegex(childSords, regEx, "CONTRACT_MIN_TERM");
+    */
+    filterArrayListMapfieldRegex: function(sordArrList, filterValue, fieldToFilterWith) {
+
+        //Erstelle einen Iterator für die ArrayList mit Sords
+        var iterator = sordArrList.iterator();
+
+        //Iteriere durch alle Elemente
+        while (iterator.hasNext()) {            
+            
+            var sordArrListValue = this.getMapValue(iterator.next().id, fieldToFilterWith);
+
+            if (sordArrListValue.search(filterValue) == -1) {
+                //Entferne bei Sord aus der ArrayList
+                iterator.remove();
+            }
+        }
+
+        return sordArrList;
+    },
+};
+
+/**
+ * Funktionen für Zeit und Datum. Nutzt u.a. Funktionen von:  
+ * {@link https://docs.oracle.com/javase/8/docs/api/java/util/Date.html Date}
+ * {@link https://docs.oracle.com/javase/7/docs/api/java/util/Calendar.html Calendar}
  * @memberof weinrich.as
  * @namespace weinrich.as.DateUtils
  * @type {object}
@@ -1807,328 +2132,5 @@ weinrich.as.FileUtils = {
             weinrich.as.Utils.logging(true, "Fehler beim Verschieben der Datei.\n" + ex);
             return false;
         }
-    },
-};
-
-/**
- * Funktionen um das Filtern zu vereinfachen
- * @memberof weinrich.as
- * @namespace weinrich.as.FilterUtils
- * @type {object}
- */
- weinrich.as.FilterUtils = {
-     
-    /**
-    * Filtert die übergebene ArrayList nach Sords, dessen Kurzbezeichnung den Filterwert enthält.
-    * @author   Erik Köhler - Weinrich
-    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)
-    * @param    {String}                    filterValue            Wert, nach dem gefiltert wird
-    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
-    * @example
-    * var sord = weinrich.as.Utils.getSordById(43532);        
-    * var childSords = weinrich.as.Utils.getChildSordsById(sord.id);
-    * var filteredArrayList = weinrich.as.Utils.filterArrayListByNameContains(childSords, "Mietvertrag");
-    */
-    filterArrayListByNameContains: function(sordArrList, filterValue) {
-
-        //Erstelle einen Iterator für die ArrayList mit Sords
-        var iterator = sordArrList.iterator();
-
-        //Iteriere durch alle Elemente
-         while (iterator.hasNext()) {   
-            
-            var sordArrListValue = iterator.next().name;    
-
-            //Prüfe, ob der String, nach dem gefiltert werden soll, in der Kurzbezeichnung existiert
-            if (!sordArrListValue.contains(filterValue)) {
-                //Entferne bei Sord aus der ArrayList
-                iterator.remove();
-            }
-        }
-
-        return sordArrList;
-    },
-
-    /**
-    * Filtert die übergebene ArrayList nach Sords, dessen Kurzbezeichnung dem Filterwert entspricht.
-    * @author   Erik Köhler - Weinrich
-    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)
-    * @param    {String}                    filterValue            Wert, nach dem gefiltert wird
-    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
-    * @example
-    * var sord = weinrich.as.Utils.getSordById(43532);        
-    * var childSords = weinrich.as.Utils.getChildSordsById(sord.id);
-    * var filteredArrayList = weinrich.as.Utils.filterArrayListByNameEquals(childSords, "C000033 Mietvertrag");
-    */
-    filterArrayListByNameEquals: function(sordArrList, filterValue) {
-
-        //Erstelle einen Iterator für die ArrayList mit Sords
-        var iterator = sordArrList.iterator();
-
-        //Iteriere durch alle Elemente
-         while (iterator.hasNext()) {   
-            
-            var sordArrListValue = iterator.next().name;    
-
-            //Prüfe, ob der String, nach dem gefiltert werden soll, in der Kurzbezeichnung existiert
-            if (sordArrListValue != filterValue) {
-                //Entferne bei Sord aus der ArrayList
-                iterator.remove();
-            }
-        }
-
-        return sordArrList;
-    },
-
-    /**
-    * Filtert die übergebene ArrayList nach Sords, dessen Kurzbezeichnung dem Regex entsprechen.
-    * @author   Erik Köhler - Weinrich
-    * @param    {java.util.ArrayList<Sord>} sordArrList         Zu filternde ArrayList (Java)
-    * @param    {String}                    regex               Regex für die Kurzbezeichnung
-    * @return   {java.util.ArrayList<Sord>}                     Gefilterte Arraylist
-    * @example
-    * var regEx = "(C[0-9]{6})";
-    * var sord = weinrich.as.Utils.getSordById(43532);        
-    * var childSords = weinrich.as.Utils.getChildSordsById(sord.id);
-    * var filteredArrayList = weinrich.as.Utils.filterArrayListByNameRegex(childSords, regEx);
-    */
-    filterArrayListByNameRegex: function(sordArrList, regex) {
-
-        //Erstelle einen Iterator für die ArrayList mit Sords
-        var iterator = sordArrList.iterator();
-
-        //Iteriere durch alle Elemente
-        while (iterator.hasNext()) {   
-            
-            var sordArrListValue = iterator.next().name;  
-
-            //Prüfe, ob der Kurzbezeichnung dem Regex entspricht
-            if (sordArrListValue.search(regex) == -1) {
-                //Entferne Sord aus der ArrayList
-                iterator.remove();
-            }
-        }
-
-        return sordArrList;
-    },
-
-    /**
-    * Filtert die übergebene ArrayList nach Sords mit der uebergebenen Maske
-    * @author   Erik Köhler - Weinrich
-    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)
-    * @param    {String}                    filterValue            Maske, nach der gefiltert wird
-    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist                   Gefilterte Arraylist
-    * @example
-    * var sord = weinrich.as.Utils.getSordById(43532);
-    * var contractSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
-    */
-    filterArrayListByMask: function(sordArrList, maskname) {
-
-        //Erstelle einen Iterator für die ArrayList mit Sords
-        var iterator = sordArrList.iterator();
-
-        //Iteriere durch alle Elemente
-         while (iterator.hasNext()) {   
-            
-            var sordArrListValue = iterator.next().maskName;    
-
-            //Prüfe, ob der String, nach dem gefiltert werden soll, in der Kurzbezeichnung existiert
-            if (!sordArrListValue.contains(maskname)) {
-                //Entferne bei Sord aus der ArrayList
-                iterator.remove();
-            }
-        }
-
-        return sordArrList;
-    },
-
-    /**
-    * Filtert die übergebene ArrayList. Prüft, ob das Indexfeld einen Wert beinhaltet.
-    * @author   Erik Köhler - Weinrich
-    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)
-    * @param    {String}                    filterValue            Wert, nach dem gefiltert wird
-    * @param    {String}                    fieldToFilterWith      Name des Indexfeldes
-    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
-    * @example
-    * var sord = weinrich.as.Utils.getSordById(43532);
-    * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
-    * var filteredArrayList = weinrich.as.Utils.filterArrayListIndexfieldContains(childSords, "Mietvertrag", "CONTRACT_NAME");
-    */
-    filterArrayListIndexfieldContains: function(sordArrList, filterValue, fieldToFilterWith) {
-
-        //Erstelle einen Iterator für die ArrayList mit Sords
-        var iterator = sordArrList.iterator();
-
-        //Iteriere durch alle Elemente
-        while (iterator.hasNext()) {            
-            
-            var sordArrListValue = this.getIndexfieldValueByName(iterator.next().id, fieldToFilterWith);
-
-            //Prüfe, ob der String, nach dem gefiltert werden soll, im Indexfeld existiert
-            if (!sordArrListValue.contains(filterValue)) {
-                //Entferne bei Sord aus der ArrayList
-                iterator.remove();
-            }
-        }
-
-        return sordArrList;
-    },
-
-    /**
-    * Filtert die übergebene ArrayList. Prüft, ob das Indexfeld gleich einem Wert ist.
-    * @author   Erik Köhler - Weinrich
-    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)
-    * @param    {String}                    filterValue            Wert, nach dem gefiltert wird
-    * @param    {String}                    fieldToFilterWith      Name des Indexfeldes
-    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
-    * @example
-    * var sord = weinrich.as.Utils.getSordById(43532);
-    * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
-    * var filteredArrayList = weinrich.as.Utils.filterArrayListIndexfieldEquals(childSords,  "Mietverträge Seniorenwohnanlagen", "CONTRACT_TYPE");
-    */
-    filterArrayListIndexfieldEquals: function(sordArrList, filterValue, fieldToFilterWith) {
-
-        //Erstelle einen Iterator für die ArrayList mit Sords
-        var iterator = sordArrList.iterator();
-
-        //Iteriere durch alle Elemente
-        while (iterator.hasNext()) {            
-            
-            var sordArrListValue = this.getIndexfieldValueByName(iterator.next().id, fieldToFilterWith);
-
-            if (sordArrListValue != filterValue) {
-                //Entferne bei Sord aus der ArrayList
-                iterator.remove();
-            }
-        }
-
-        return sordArrList;
-    },
-
-    /**
-    * Filtert die übergebene ArrayList. Prüft, ob das Indexfeld gleich Regex entspricht.
-    * @author   Erik Köhler - Weinrich
-    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)
-    * @param    {String}                    filterValue            Wert, nach dem gefiltert wird
-    * @param    {String}                    fieldToFilterWith      Name des Indexfeldes
-    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
-    * @example
-    * var regEx = "(C[0-9]{6})";
-    * var sord = weinrich.as.Utils.getSordById(43532);
-    * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
-    * var filteredArrayList = weinrich.as.Utils.filterArrayListIndexfieldRegex(childSords, regEx, "CONTRACT_NAME");
-    */
-    filterArrayListIndexfieldRegex: function(sordArrList, filterValue, fieldToFilterWith) {
-
-        //Erstelle einen Iterator für die ArrayList mit Sords
-        var iterator = sordArrList.iterator();
-
-        //Iteriere durch alle Elemente
-        while (iterator.hasNext()) {            
-            
-            var sordArrListValue = this.getIndexfieldValueByName(iterator.next().id, fieldToFilterWith);
-
-            if (sordArrListValue.search(filterValue) == -1) {
-                //Entferne bei Sord aus der ArrayList
-                iterator.remove();
-            }
-        }
-
-        return sordArrList;
-    },
-    
-    /**
-    * Filtert die übergebene ArrayList. Prüft, ob das Mapfeld einen Wert beinhaltet.
-    * @author   Erik Köhler - Weinrich
-    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)
-    * @param    {String}                    filterValue            Wert, nach dem gefiltert wird
-    * @param    {String}                    fieldToFilterWith      Name des Mapfeldes
-    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
-    * @example
-    * var sord = weinrich.as.Utils.getSordById(43532);
-    * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
-    * var filteredArrayList = weinrich.as.Utils.filterArrayListMapfieldContains(childSords, "EUR", "CONTRACT_BASE_CURRENCY_CODE");
-    */
-    filterArrayListMapfieldContains: function(sordArrList, filterValue, fieldToFilterWith) {
-
-        //Erstelle einen Iterator für die ArrayList mit Sords
-        var iterator = sordArrList.iterator();
-
-        //Iteriere durch alle Elemente
-        while (iterator.hasNext()) {            
-            
-            var sordArrListValue = this.getMapValue(iterator.next().id, fieldToFilterWith);
-
-            //Prüfe, ob der String, nach dem gefiltert werden soll, im Indexfeld existiert
-            if (!sordArrListValue.contains(filterValue)) {
-                //Entferne bei Sord aus der ArrayList
-                iterator.remove();
-            }
-        }
-
-        return sordArrList;
-    },
-
-    /**
-    * Filtert die übergebene ArrayList. Prüft, ob das Mapfeld gleich einem Wert ist.
-    * @author   Erik Köhler - Weinrich
-    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)
-    * @param    {String}                    filterValue            Wert, nach dem gefiltert wird
-    * @param    {String}                    fieldToFilterWith      Name des Mapfeldes
-    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
-    * @example
-    * var sord = weinrich.as.Utils.getSordById(43532);
-    * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
-    * var filteredArrayList = weinrich.as.Utils.filterArrayListMapfieldEquals(childSords, "EUR", "CONTRACT_BASE_CURRENCY_CODE");
-    */
-    filterArrayListMapfieldEquals: function(sordArrList, filterValue, fieldToFilterWith) {
-
-        //Erstelle einen Iterator für die ArrayList mit Sords
-        var iterator = sordArrList.iterator();
-
-        //Iteriere durch alle Elemente
-        while (iterator.hasNext()) {            
-            
-            var sordArrListValue = this.getMapValue(iterator.next().id, fieldToFilterWith);
-
-            if (sordArrListValue != filterValue) {
-                //Entferne bei Sord aus der ArrayList
-                iterator.remove();
-            }
-        }
-
-        return sordArrList;
-    },
-
-    /**
-    * Filtert die übergebene ArrayList. Prüft, ob das Mapfeld gleich Regex entspricht.
-    * @author   Erik Köhler - Weinrich
-    * @param    {java.util.ArrayList<Sord>} sordArrList            Zu filternde ArrayList (Java)
-    * @param    {String}                    filterValue            Wert, nach dem gefiltert wird
-    * @param    {String}                    fieldToFilterWith      Name des Mapfeldes
-    * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
-    * @example
-    * var regEx = "([0-9])";
-    * var sord = weinrich.as.Utils.getSordById(43532);
-    * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
-    * var filteredArrayList = weinrich.as.Utils.filterArrayListMapfieldRegex(childSords, regEx, "CONTRACT_MIN_TERM");
-    */
-    filterArrayListMapfieldRegex: function(sordArrList, filterValue, fieldToFilterWith) {
-
-        //Erstelle einen Iterator für die ArrayList mit Sords
-        var iterator = sordArrList.iterator();
-
-        //Iteriere durch alle Elemente
-        while (iterator.hasNext()) {            
-            
-            var sordArrListValue = this.getMapValue(iterator.next().id, fieldToFilterWith);
-
-            if (sordArrListValue.search(filterValue) == -1) {
-                //Entferne bei Sord aus der ArrayList
-                iterator.remove();
-            }
-        }
-
-        return sordArrList;
     },
 };
