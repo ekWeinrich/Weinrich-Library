@@ -135,6 +135,31 @@ weinrich.as.Utils = {
   	},
 
     /**
+    * Benenne das Sord über die ObjId um.
+    * @author   Erik Köhler - Weinrich
+    * @param    {int}       sordId      ObjId, des zu umzubenennenden Sords
+    * @param    {String}    name        Neue Kurzbezeichnung des Sords
+    * @return   {bool}                  Geladenes Sord, ansonsten undefined
+    */
+    renameSordById: function (sordId, name) {
+            
+        try {    
+
+            var sord = ixConnect.ix().checkoutSord(sordId, EditInfoC.mbAll, LockC.NO).sord;
+
+            sord.name = name;
+
+            ixConnect.ix().checkinSord(sord, SordC.mbAll, LockC.NO);
+
+            return true;
+        }
+        catch (ex) {
+            this.logging(true, "Fehler beim Umbenennen des Sords " + sordId + " über seine Id.\n" + ex);
+            return undefined;
+        }
+    },
+
+    /**
     * Prüfe, ob diese Datei bereits in ELO existiert.
     * @author   Erik Köhler - Weinrich
     * @param    {File}   file   Pfad für die Datei/den Ordner, der zu prüfen ist
@@ -1247,7 +1272,7 @@ weinrich.as.Utils = {
     * @example
     * var sord = weinrich.as.Utils.getSordById(43532);        
     * var childSords = weinrich.as.Utils.getChildSordsById(sord.id);
-    * var filteredArrayList = weinrich.as.Utils.filterArrayListByNameContains(childSords, "Mietvertrag");
+    * var filteredArrayList = weinrich.as.FilterUtils.filterArrayListByNameContains(childSords, "Mietvertrag");
     */
     filterArrayListByNameContains: function(sordArrList, filterValue) {
 
@@ -1278,7 +1303,7 @@ weinrich.as.Utils = {
     * @example
     * var sord = weinrich.as.Utils.getSordById(43532);        
     * var childSords = weinrich.as.Utils.getChildSordsById(sord.id);
-    * var filteredArrayList = weinrich.as.Utils.filterArrayListByNameEquals(childSords, "C000033 Mietvertrag");
+    * var filteredArrayList = weinrich.as.FilterUtils.filterArrayListByNameEquals(childSords, "C000033 Mietvertrag");
     */
     filterArrayListByNameEquals: function(sordArrList, filterValue) {
 
@@ -1310,7 +1335,7 @@ weinrich.as.Utils = {
     * var regEx = "(C[0-9]{6})";
     * var sord = weinrich.as.Utils.getSordById(43532);        
     * var childSords = weinrich.as.Utils.getChildSordsById(sord.id);
-    * var filteredArrayList = weinrich.as.Utils.filterArrayListByNameRegex(childSords, regEx);
+    * var filteredArrayList = weinrich.as.FilterUtils.filterArrayListByNameRegex(childSords, regEx);
     */
     filterArrayListByNameRegex: function(sordArrList, regex) {
 
@@ -1340,7 +1365,7 @@ weinrich.as.Utils = {
     * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist                   Gefilterte Arraylist
     * @example
     * var sord = weinrich.as.Utils.getSordById(43532);
-    * var contractSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
+    * var contractSords = weinrich.as.FilterUtils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
     */
     filterArrayListByMask: function(sordArrList, maskname) {
 
@@ -1372,7 +1397,7 @@ weinrich.as.Utils = {
     * @example
     * var sord = weinrich.as.Utils.getSordById(43532);
     * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
-    * var filteredArrayList = weinrich.as.Utils.filterArrayListIndexfieldContains(childSords, "Mietvertrag", "CONTRACT_NAME");
+    * var filteredArrayList = weinrich.as.FilterUtils.filterArrayListIndexfieldContains(childSords, "Mietvertrag", "CONTRACT_NAME");
     */
     filterArrayListIndexfieldContains: function(sordArrList, filterValue, fieldToFilterWith) {
 
@@ -1404,7 +1429,7 @@ weinrich.as.Utils = {
     * @example
     * var sord = weinrich.as.Utils.getSordById(43532);
     * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
-    * var filteredArrayList = weinrich.as.Utils.filterArrayListIndexfieldEquals(childSords,  "Mietverträge Seniorenwohnanlagen", "CONTRACT_TYPE");
+    * var filteredArrayList = weinrich.as.FilterUtils.filterArrayListIndexfieldEquals(childSords,  "Mietverträge Seniorenwohnanlagen", "CONTRACT_TYPE");
     */
     filterArrayListIndexfieldEquals: function(sordArrList, filterValue, fieldToFilterWith) {
 
@@ -1436,7 +1461,7 @@ weinrich.as.Utils = {
     * var regEx = "(C[0-9]{6})";
     * var sord = weinrich.as.Utils.getSordById(43532);
     * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
-    * var filteredArrayList = weinrich.as.Utils.filterArrayListIndexfieldRegex(childSords, regEx, "CONTRACT_NAME");
+    * var filteredArrayList = weinrich.as.FilterUtils.filterArrayListIndexfieldRegex(childSords, regEx, "CONTRACT_NAME");
     */
     filterArrayListIndexfieldRegex: function(sordArrList, filterValue, fieldToFilterWith) {
 
@@ -1467,7 +1492,7 @@ weinrich.as.Utils = {
     * @example
     * var sord = weinrich.as.Utils.getSordById(43532);
     * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
-    * var filteredArrayList = weinrich.as.Utils.filterArrayListMapfieldContains(childSords, "EUR", "CONTRACT_BASE_CURRENCY_CODE");
+    * var filteredArrayList = weinrich.as.FilterUtils.filterArrayListMapfieldContains(childSords, "EUR", "CONTRACT_BASE_CURRENCY_CODE");
     */
     filterArrayListMapfieldContains: function(sordArrList, filterValue, fieldToFilterWith) {
 
@@ -1499,7 +1524,7 @@ weinrich.as.Utils = {
     * @example
     * var sord = weinrich.as.Utils.getSordById(43532);
     * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
-    * var filteredArrayList = weinrich.as.Utils.filterArrayListMapfieldEquals(childSords, "EUR", "CONTRACT_BASE_CURRENCY_CODE");
+    * var filteredArrayList = weinrich.as.FilterUtils.filterArrayListMapfieldEquals(childSords, "EUR", "CONTRACT_BASE_CURRENCY_CODE");
     */
     filterArrayListMapfieldEquals: function(sordArrList, filterValue, fieldToFilterWith) {
 
@@ -1531,7 +1556,7 @@ weinrich.as.Utils = {
     * var regEx = "([0-9])";
     * var sord = weinrich.as.Utils.getSordById(43532);
     * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
-    * var filteredArrayList = weinrich.as.Utils.filterArrayListMapfieldRegex(childSords, regEx, "CONTRACT_MIN_TERM");
+    * var filteredArrayList = weinrich.as.FilterUtils.filterArrayListMapfieldRegex(childSords, regEx, "CONTRACT_MIN_TERM");
     */
     filterArrayListMapfieldRegex: function(sordArrList, filterValue, fieldToFilterWith) {
 
