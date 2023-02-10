@@ -12,7 +12,8 @@ weinrich.as = {};
  * @memberof weinrich.as
  * @namespace weinrich.as.Utils
  * @type {object}
- * @version release 1.0.0 
+ * @version release 1.0.1 
+ * - {@link https://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html ArrayList}
  */
 weinrich.as.Utils = {
 
@@ -74,7 +75,29 @@ weinrich.as.Utils = {
         else {
             log.info("\n\nInitialize Log-Config before logging.\n\n");            
         }
-	},	
+    },	
+    
+    /**
+    * Prueft, ob ein Array einen Wert enthält
+    * @author   Erik Köhler - Weinrich
+    * @param    {any[]}     arr     Array, in dem gesucht werden soll
+    * @param    {any}       value   Wert, nach dem gesucht werden soll
+    * @return   {bool}              Der übergebene Wert im Array gefunden wurde
+    * @example
+    * var arr = ["Fischer", "Caritas"];
+    * var arrEnthaeltWert = weinrich.as.Utils.arrIncludes("Fischer");     
+    */
+    // TODO Teste mich
+    arrIncludes: function (arr, value) {
+        
+        if (arr) {
+            for (var i = 0; i < arr.length; i++) {
+                if (arr[i] === value)
+                    return true;
+            }
+        }
+        return false;
+    },
 
     /**
     * Importiert eine Datei in ELO.
@@ -96,15 +119,28 @@ weinrich.as.Utils = {
         try {           
             this.logging(false, "Importiere: " + file.name);
 
-            if (this.fileOrDirectoryExists(file)) {
+            if (!weinrich.as.FileUtils.fileOrDirectoryExists(file)) {
                 this.logging(false, "Datei wurde nicht gefunden.");
                 return false;
             }
+
+            if (FileUtils.sizeOf(file) <= 0) {
+                this.logging(false, "Datei darf nicht leer sein.");
+                return false;
+            }
+
+            var fileName = file.name;
+
+            //Schneide ab 128 Zeichen ab, da man sonst in einen Fehler läuft
+            if (fileName.length > 127) {
+                fileName = fileName.substring(0,127);
+                this.logging(false, "Dateiname ist länger als 128 Zeichen. Er wurde gekürzt.");
+            }
             
-            objKeysObj[DocMaskLineC.NAME_FILENAME] = file.name;
+            objKeysObj[DocMaskLineC.NAME_FILENAME] = fileName;
 
             var ed = ixConnect.ix().createDoc(sordId, maskName, null, EditInfoC.mbSordDocAtt);
-            ed.sord.name = file.name;
+            ed.sord.name = fileName;
 
             var key;
             for (key in objKeysObj) {
@@ -112,7 +148,8 @@ weinrich.as.Utils = {
             }
 
             var objKeys = Array.prototype.slice.call(ed.sord.objKeys);
-            objKeys.push(this.createObjKey(DocMaskLineC.ID_FILENAME, DocMaskLineC.NAME_FILENAME, file.name));
+            // objKeys.push(this.createObjKey(DocMaskLineC.ID_FILENAME, DocMaskLineC.NAME_FILENAME, file.name));
+            objKeys.push(this.createObjKey(DocMaskLineC.ID_FILENAME, DocMaskLineC.NAME_FILENAME, fileName));
             ed.sord.objKeys = objKeys; 
 
             ed.document.docs = [new DocVersion()];
@@ -128,7 +165,7 @@ weinrich.as.Utils = {
             return ed.document.objId;
         }
         catch (ex) {
-            this.logging(true, "Fehler beim importieren der Datei " + file.name + "\n" + ex);
+            this.logging(true, "Fehler beim Importieren der Datei " + file.name + "\n" + ex);
             
             return -1;
         }
@@ -139,7 +176,8 @@ weinrich.as.Utils = {
     * @author   Erik Köhler - Weinrich
     * @param    {int}       sordId      ObjId, des zu umzubenennenden Sords
     * @param    {String}    name        Neue Kurzbezeichnung des Sords
-    * @return   {bool}                  Geladenes Sord, ansonsten undefined
+    * @return   {bool}                  True, wenn erfolgreich umbenannt
+    * @version added 1.0.1 
     */
     renameSordById: function (sordId, name) {
             
@@ -358,7 +396,7 @@ weinrich.as.Utils = {
         }
         catch(ex) {
 			// ! Error beim Suchen mit Indexfeld
-            this.logging(true, e);
+            this.logging(true, ex);
         }
         finally {
             if(findResult != null) {
@@ -1062,7 +1100,7 @@ weinrich.as.Utils = {
         }
     },
 
-     /**
+    /**
     * Prüft, ob das Sord an der Stelle des übergebenen Pfades eine Referenz ist.
     * @author   Erik Köhler - Weinrich
     * @param    {String}    path    Pfad auf das Sord, welches überprüft werden soll, ob es eine Referenz ist
@@ -1234,7 +1272,7 @@ weinrich.as.Utils = {
     */
     getParentSordByPath: function(path) {
 
-         try {
+        try {
             
             var parentPath = this.getParentArcpathByPath(path);
             if (parentPath === undefined) throw "Error loading parent Path...";
@@ -1275,7 +1313,7 @@ weinrich.as.Utils = {
     * var filteredArrayList = weinrich.as.FilterUtils.filterArrayListByNameContains(childSords, "Mietvertrag");
     */
     filterArrayListByNameContains: function(sordArrList, filterValue) {
-
+         
         //Erstelle einen Iterator für die ArrayList mit Sords
         var iterator = sordArrList.iterator();
 
@@ -1396,7 +1434,7 @@ weinrich.as.Utils = {
     * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
     * @example
     * var sord = weinrich.as.Utils.getSordById(43532);
-    * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
+    * var childSords = weinrich.as.FilterUtils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
     * var filteredArrayList = weinrich.as.FilterUtils.filterArrayListIndexfieldContains(childSords, "Mietvertrag", "CONTRACT_NAME");
     */
     filterArrayListIndexfieldContains: function(sordArrList, filterValue, fieldToFilterWith) {
@@ -1407,7 +1445,7 @@ weinrich.as.Utils = {
         //Iteriere durch alle Elemente
         while (iterator.hasNext()) {            
             
-            var sordArrListValue = this.getIndexfieldValueByName(iterator.next().id, fieldToFilterWith);
+            var sordArrListValue = weinrich.as.Utils.getIndexfieldValueByName(iterator.next().id, fieldToFilterWith);
 
             //Prüfe, ob der String, nach dem gefiltert werden soll, im Indexfeld existiert
             if (!sordArrListValue.contains(filterValue)) {
@@ -1428,7 +1466,7 @@ weinrich.as.Utils = {
     * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
     * @example
     * var sord = weinrich.as.Utils.getSordById(43532);
-    * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
+    * var childSords = weinrich.as.FilterUtils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
     * var filteredArrayList = weinrich.as.FilterUtils.filterArrayListIndexfieldEquals(childSords,  "Mietverträge Seniorenwohnanlagen", "CONTRACT_TYPE");
     */
     filterArrayListIndexfieldEquals: function(sordArrList, filterValue, fieldToFilterWith) {
@@ -1439,7 +1477,7 @@ weinrich.as.Utils = {
         //Iteriere durch alle Elemente
         while (iterator.hasNext()) {            
             
-            var sordArrListValue = this.getIndexfieldValueByName(iterator.next().id, fieldToFilterWith);
+            var sordArrListValue = weinrich.as.Utils.getIndexfieldValueByName(iterator.next().id, fieldToFilterWith);
 
             if (sordArrListValue != filterValue) {
                 //Entferne bei Sord aus der ArrayList
@@ -1460,7 +1498,7 @@ weinrich.as.Utils = {
     * @example
     * var regEx = "(C[0-9]{6})";
     * var sord = weinrich.as.Utils.getSordById(43532);
-    * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
+    * var childSords = weinrich.as.FilterUtils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
     * var filteredArrayList = weinrich.as.FilterUtils.filterArrayListIndexfieldRegex(childSords, regEx, "CONTRACT_NAME");
     */
     filterArrayListIndexfieldRegex: function(sordArrList, filterValue, fieldToFilterWith) {
@@ -1471,7 +1509,7 @@ weinrich.as.Utils = {
         //Iteriere durch alle Elemente
         while (iterator.hasNext()) {            
             
-            var sordArrListValue = this.getIndexfieldValueByName(iterator.next().id, fieldToFilterWith);
+            var sordArrListValue = weinrich.as.Utils.getIndexfieldValueByName(iterator.next().id, fieldToFilterWith);
 
             if (sordArrListValue.search(filterValue) == -1) {
                 //Entferne bei Sord aus der ArrayList
@@ -1491,7 +1529,7 @@ weinrich.as.Utils = {
     * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
     * @example
     * var sord = weinrich.as.Utils.getSordById(43532);
-    * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
+    * var childSords = weinrich.as.FilterUtils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
     * var filteredArrayList = weinrich.as.FilterUtils.filterArrayListMapfieldContains(childSords, "EUR", "CONTRACT_BASE_CURRENCY_CODE");
     */
     filterArrayListMapfieldContains: function(sordArrList, filterValue, fieldToFilterWith) {
@@ -1502,7 +1540,7 @@ weinrich.as.Utils = {
         //Iteriere durch alle Elemente
         while (iterator.hasNext()) {            
             
-            var sordArrListValue = this.getMapValue(iterator.next().id, fieldToFilterWith);
+            var sordArrListValue = weinrich.as.Utils.getMapValue(iterator.next().id, fieldToFilterWith);
 
             //Prüfe, ob der String, nach dem gefiltert werden soll, im Indexfeld existiert
             if (!sordArrListValue.contains(filterValue)) {
@@ -1523,7 +1561,7 @@ weinrich.as.Utils = {
     * @return   {java.util.ArrayList<Sord>}                        Gefilterte Arraylist
     * @example
     * var sord = weinrich.as.Utils.getSordById(43532);
-    * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
+    * var childSords = weinrich.as.FilterUtils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
     * var filteredArrayList = weinrich.as.FilterUtils.filterArrayListMapfieldEquals(childSords, "EUR", "CONTRACT_BASE_CURRENCY_CODE");
     */
     filterArrayListMapfieldEquals: function(sordArrList, filterValue, fieldToFilterWith) {
@@ -1534,7 +1572,7 @@ weinrich.as.Utils = {
         //Iteriere durch alle Elemente
         while (iterator.hasNext()) {            
             
-            var sordArrListValue = this.getMapValue(iterator.next().id, fieldToFilterWith);
+            var sordArrListValue = weinrich.as.Utils.getMapValue(iterator.next().id, fieldToFilterWith);
 
             if (sordArrListValue != filterValue) {
                 //Entferne bei Sord aus der ArrayList
@@ -1555,7 +1593,7 @@ weinrich.as.Utils = {
     * @example
     * var regEx = "([0-9])";
     * var sord = weinrich.as.Utils.getSordById(43532);
-    * var childSords = weinrich.as.Utils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
+    * var childSords = weinrich.as.FilterUtils.filterArrayListByMask(weinrich.as.Utils.getChildSordsById(sord.id), "Contract");
     * var filteredArrayList = weinrich.as.FilterUtils.filterArrayListMapfieldRegex(childSords, regEx, "CONTRACT_MIN_TERM");
     */
     filterArrayListMapfieldRegex: function(sordArrList, filterValue, fieldToFilterWith) {
@@ -1566,7 +1604,7 @@ weinrich.as.Utils = {
         //Iteriere durch alle Elemente
         while (iterator.hasNext()) {            
             
-            var sordArrListValue = this.getMapValue(iterator.next().id, fieldToFilterWith);
+            var sordArrListValue = weinrich.as.Utils.getMapValue(iterator.next().id, fieldToFilterWith);
 
             if (sordArrListValue.search(filterValue) == -1) {
                 //Entferne bei Sord aus der ArrayList
@@ -2159,6 +2197,114 @@ weinrich.as.FileUtils = {
         catch(ex) {
             weinrich.as.Utils.logging(true, "Fehler beim Verschieben der Datei.\n" + ex);
             return false;
+        }
+    },
+
+    /**
+    * Löscht eine Datei in den angegebenen Pfad.
+    * @author   Erik Köhler - Weinrich
+    * @memberof weinrich.as.FileUtils
+    * @method   deleteFileOrDirectory
+    * @param    {File}   srcFile        Pfad auf die zu löschende Datei
+    * @return   {bool}                  True wenn erfolgreich gelöscht
+    * @example
+    * var srcFile = new File("C:\\temp\\tmp\\tmp.pdf");
+    * weinrich.as.FileUtils.deleteFileOrDirectory(srcFile);
+    */
+    deleteFile: function (srcFile) {        
+        try {
+
+            //Prüfe, ob die zu löschende Datei existiert
+            if (!this.fileOrDirectoryExists(srcFile)) {
+                weinrich.as.Utils.logging(true, "Fehler beim Löschen der Datei. Datei nicht gefunden.");
+                return false;
+            }
+
+            FileUtils.delete(srcFile);
+
+            return true;
+        }
+        catch (ex) {
+            weinrich.as.Utils.logging(true, "Fehler beim Löschen der Datei.\n" + ex);
+            return false;
+        }
+    },
+
+    /**
+    * Löscht ein Verzeichnis rekursiv.
+    * @author   Erik Köhler - Weinrich
+    * @memberof weinrich.as.FileUtils
+    * @method   deleteFileOrDirectory
+    * @param    {File}   srcDir     Pfad auf die zu löschendes Verzeichnis
+    * @return   {bool}              True wenn erfolgreich gelöscht
+    * @example
+    * var srcFile = new File("C:\\temp\\tmp\\tmp.pdf");
+    * weinrich.as.FileUtils.deleteDirectory(srcFile);
+    */
+    deleteDirectory: function (srcDir) {        
+        try {
+
+            //Prüfe, ob die zu löschende Datei existiert
+            if (!this.fileOrDirectoryExists(srcDir)) {
+                weinrich.as.Utils.logging(true, "Fehler beim Löschen der Datei. Datei nicht gefunden.");
+                return false;
+            }
+
+            FileUtils.deleteDirectory(srcDir);
+
+            return true;
+        }
+        catch (ex) {
+            weinrich.as.Utils.logging(true, "Fehler beim Löschen der Datei.\n" + ex);
+            return false;
+        }
+    },
+};
+
+/**
+ * Funktionen auf Dateiebene. Nutzt u.a. Funktionen von:  
+ * - {@link http://www.forum.elo.com/javadoc/ix/20/de/elo/ix/client/WFDiagram.html}
+ * @memberof weinrich.as
+ * @namespace weinrich.as.WorkflowUtils
+ * @type {object}
+ * @version release 1.0.0 
+ */
+//TODO Test ich
+weinrich.as.WorkflowUtils = {
+     
+    /**
+    * Prüft, ob die Datei bzw. das Verzeichnis existiert.
+    * @author   Erik Köhler - Weinrich
+    * @memberof weinrich.as.WorkflowUtils
+    * @method   getWorkflowsByTemplateName
+    * @param    {int}       sordId              Id des Dokuments für das die Workflows 
+    * @param    {string}    wfTemplateName      Name des Templates 
+    * @return   {WFDiagram}                     Gibt den/die gefundenen Workflow/-s zurück. Ansonsten undefined.
+    */
+    getWorkflowsByTemplateName: function (sordId, wfTemplateName) {
+          
+        try {
+            
+            //Pruefe, ob ein aktiver Workflow mit dem uebergebenen Template Namen existiert
+            if (sol.common.WfUtils.hasActiveWorkflow(sordId, wfTemplateName)) {
+                //Kein aktiver Workflow mit dem Template gefunden
+                return undefined;
+            }
+
+            //Setze Filter auf den Template Namen
+            let filter = { template: wfTemplateName };
+            
+            //Lade die aktiven Workflows fuer das Sord abhaengig vom Template Namen des Workflows
+            let wfs = sol.common.WfUtils.getActiveWorkflows(sordId, filter);  
+    
+            this.logging(false, "Anzahl gefundener Workflows = " + wfs.length);
+
+            return wfs;           
+        }
+        catch (ex) {
+            this.logging(true, "Fehler beim Laden des Workflows von " + sordId +
+                " über den Template Namen '" + wfTemplateName + "'.\n" + ex);
+            return undefined;
         }
     },
 };

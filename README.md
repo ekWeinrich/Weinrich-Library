@@ -34,3 +34,10 @@ True/False stehen hier für Prioritätslog. Bei True wird immer ein Logeintrag g
 
 Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="https://github.com/ekWeinrich/Weinrich-Library/issues">hier</a> 
 übermittelt werden.
+
+# Patchnotes:
+
+Version 1.0.1
+
+- added weinrich.as.Utils.renameSordById(int id, string name)
+- added weinrich.as.Utils.arrIncludes(any[] arr, any value)
