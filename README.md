@@ -35,7 +35,7 @@ True/False stehen hier für Prioritätslog. Bei True wird immer ein Logeintrag g
 Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="https://github.com/ekWeinrich/Weinrich-Library/issues">hier</a> 
 übermittelt werden.
 
-# Patchnotes:
+# Patchnotes
 
 Version 1.0.2
 

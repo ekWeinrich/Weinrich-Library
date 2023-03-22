@@ -209,7 +209,7 @@ weinrich.as.Utils = {
 	},
 
     /**
-    * Lösche Sord.
+    * Lösche Sord (markiere Sord als gelöscht).
     * @author   Erik Köhler - Weinrich
     * @param    {int}   sordId              ObjId des zu löschenden Sords
     * @param    {bool}  folderMustBeEmpty   Lösche nur einen Ordner, wenn dieser bereits leer ist
@@ -248,7 +248,49 @@ weinrich.as.Utils = {
         }
 
         return false;
-	},
+    },
+    
+    /**
+    * Lösche Sord endgültig.
+    * @author   Erik Köhler - Weinrich
+    * @param    {int}   sordId              ObjId des zu löschenden Sords
+    * @param    {bool}  folderMustBeEmpty   Lösche nur einen Ordner, wenn dieser bereits leer ist
+    * @return   {bool}                      True wenn Sord erfolgreich gelöscht wurde
+    * @example
+    * var sordId = 51970;
+    * var folderMustBeEmpty = true;        
+    * weinrich.as.Utils.deleteSordFinally(sordId, folderMustBeEmpty);
+    */
+    deleteSordFinally: function(sordId, folderMustBeEmpty) {
+        try {
+            //Lädt Sord über die sordId
+            var ed = ixConnect.ix().checkoutDoc(sordId, null, EditInfoC.mbSordDocAtt, LockC.NO);
+            var sord = ed.sord;
+            //Konfiguriere die Löschoptionen
+            var delOptions = new DeleteOptions();
+            //Lösche nur einen Ordner, wenn dieser bereits leer ist
+            delOptions.folderMustBeEmpty = folderMustBeEmpty;
+            try {
+                //Markiere Sord als gelöscht
+                ixConnect.ix().deleteSord(sord.getParentId(), sord.getId(), LockC.NO, delOptions);
+                //Setze Flag zum endgültigen Löschen des Sords
+                delOptions.deleteFinally = true;
+                //Lösche das Sord endgülig, falls es leer ist oder folderMustBeEmpty=falses
+                return ixConnect.ix().deleteSord(sord.getParentId(), sord.getId(), LockC.NO, delOptions);
+            }
+            catch(e2) {
+                // ! Verzeichnis noch nicht leer! Mache dann nichts
+                this.logging(true, "Fehler beim Löschen des Sords (" + sordId + ").\n" + e2);
+            }
+
+            ixConnect.ix().checkinDocEnd(ed.sord, SordC.mbAll, ed.document, LockC.NO);
+        }
+        catch(e1) {
+            this.logging(true, e1);
+        }
+
+        return false;
+    },
 
     /**
     * Verschiebt das Sord in das neue Verzeichnis in ELO. Wurde das Verzeichnis dadurch komplett geleert, lösche es.
@@ -412,8 +454,7 @@ weinrich.as.Utils = {
     * @author   Erik Köhler - Weinrich
     * @param    {int}       parentId    ObjId des Verzeichnisses, in dem nach der Kurzbezeichnung gesucht werden soll
     * @param    {String}    folderName  Kurzbezeichnung, welche gesucht werden soll
-    * @return   {bool}                  True, wenn Kurzbezeichnung bereits in Verzeichnis existiert  nen
-    * @return   {Sord[]}                Gibt die gefundenen Sords als Array zurück
+    * @return   {bool}                  True, wenn Kurzbezeichnung bereits in Verzeichnis existiert 
     * @example
     * var parentId = 12345;
     * var folderName = "Personalakten";
@@ -436,6 +477,37 @@ weinrich.as.Utils = {
 		
 		return false;
 	},
+
+
+    // TODO: SCHREIB MICH FERTIG
+    // /**
+    // * Prüfe in ELO, ob in einem Verzeichnis ein Ordner mit der Kurzbezeichnung existiert und gibt falls ja die Id des Sords zurück
+    // * @author   Erik Köhler - Weinrich
+    // * @param    {int}       parentId    ObjId des Verzeichnisses, in dem nach der Kurzbezeichnung gesucht werden soll
+    // * @param    {String}    folderName  Kurzbezeichnung, welche gesucht werden soll
+    // * @return   {Sord[]}                Gibt die gefundenen Sords als Array zurück
+    // * @example
+    // * var parentId = 12345;
+    // * var folderName = "Personalakten";
+    // * var folderExists = weinrich.as.Utils.checkFolderExistsInArchive(parentId, folderName);
+    // */
+	// getFolderByParentIdAndName: function(parentId, folderName) {
+		
+	// 	//Lade das Elterverzeichnis
+	// 	var sords = Packages.de.elo.mover.utils.ELOAsUtils.getSubFolders(emConnect, parentId);
+    //     if (sords === undefined) throw "Error loading Sords...";
+				
+    //     //Gehe alle Unterordner durch und suche nach der Kurzbezeichnung
+	// 	for(var i = 0; i < sords.length; i++) {
+	// 		var sord = sords[i];
+			
+	// 		if(sord.name == folderName) {		
+	// 			return true;
+	// 		}
+	// 	}
+		
+	// 	return false;
+	// },
 
     /**
     * Ändert das Icon eines Sords. Die IDs der Icons findet man in der Adminkonsole unter Eintragstypen.
