@@ -37,6 +37,10 @@ Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="
 
 # Patchnotes
 
+Version 1.0.3
+
+- Hinzugefügt: weinrich.as.Utils.deleteSordFinally(int sordid, bool folderMustBeEmpty)
+
 Version 1.0.2
 
 - In FilterUtils jedes falsche "this" überarbeitet

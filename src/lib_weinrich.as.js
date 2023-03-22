@@ -12,7 +12,7 @@ weinrich.as = {};
  * @memberof weinrich.as
  * @namespace weinrich.as.Utils
  * @type {object}
- * @version release 1.0.2 
+ * @version release 1.0.3 
  * - {@link https://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html ArrayList}
  */
 weinrich.as.Utils = {
