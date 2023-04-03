@@ -476,6 +476,35 @@ weinrich.as.Utils = {
 		}
 		
 		return false;
+    },
+
+    /**
+    * Lade die ObjektId eines Ordners über dessen Kurzbezeichnung innerhalb eines Verzeichnisses
+    * @author   Erik Köhler - Weinrich
+    * @param    {int}       parentId    ObjId des Verzeichnisses, in dem nach der Kurzbezeichnung gesucht werden soll
+    * @param    {String}    folderName  Kurzbezeichnung, welche gesucht werden soll
+    * @return   {int}                   ObjId des gefundenen Ordners. Ansonsten -1.
+    * @example
+    * var parentId = 12345;
+    * var folderName = "Personalakten";
+    * var folderId = weinrich.as.Utils.getFolderIdFromParentByName(parentId, folderName);
+    */
+	getFolderIdFromParentByName: function(parentId, folderName) {
+		
+		//Lade das Elterverzeichnis
+		var sords = Packages.de.elo.mover.utils.ELOAsUtils.getSubFolders(emConnect, parentId);
+        if (sords === undefined) throw "Error loading Sords...";
+				
+        //Gehe alle Unterordner durch und suche nach der Kurzbezeichnung
+		for(var i = 0; i < sords.length; i++) {
+			var sord = sords[i];
+			
+			if(sord.name == folderName) {		
+				return sord.id;
+			}
+		}
+		
+		return -1;
 	},
 
 
