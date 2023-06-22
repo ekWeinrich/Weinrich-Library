@@ -59,6 +59,7 @@ Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="
 
 **Hinzugefügt:** weinrich.as.Utils.setIndexfieldValueByName(sordId, indexfieldName, indexfieldValue);
 - Setzt den Wert des Indexfeldes eines Sords über den Namen des Indexfeldes
+
 **Hinzugefügt:** weinrich.as.Utils.setIndexfieldValueByParamList(sordId, objKeysObj);
 - Setzt Werte des Indexfeldes eines Sords über ein Objekt (z.B. {"BETRAG": "499.50"})
 
@@ -70,11 +71,11 @@ Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="
 
 ## Version 1.0.4
 
-**Hinzugefügt:** weinrich.as.Utils.getFolderIdFromParentByName(int parentId, string folderName)
+**Hinzugefügt:** weinrich.as.Utils.getFolderIdFromParentByName(int parentId, string folderName);
 
 ## Version 1.0.3
 
-**Hinzugefügt:** weinrich.as.Utils.deleteSordFinally(int sordid, bool folderMustBeEmpty)
+**Hinzugefügt:** weinrich.as.Utils.deleteSordFinally(int sordid, bool folderMustBeEmpty);
 
 ## Version 1.0.2
 
@@ -82,5 +83,6 @@ Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="
 
 ## Version 1.0.1
 
-**Hinzugefügt:** weinrich.as.Utils.renameSordById(int id, string name)
-**Hinzugefügt:** weinrich.as.Utils.arrIncludes(any[] arr, any value)
+**Hinzugefügt:** weinrich.as.Utils.renameSordById(int id, string name);
+
+**Hinzugefügt:** weinrich.as.Utils.arrIncludes(any[] arr, any value);
