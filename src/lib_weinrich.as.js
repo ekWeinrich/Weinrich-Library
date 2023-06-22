@@ -789,7 +789,7 @@ weinrich.as.Utils = {
             var sord = this.getSordById(sordId);                
             if (sord === undefined) throw "Error loading Sord...";
 
-            ix.setIndexValueByName(ed.sord, objKeyName, objKeyValue);
+            ix.setIndexValueByName(sord, objKeyName, objKeyValue);
         }
         catch (ex) {
             this.logging(true, "Fehler beim Setzen des Wertes eines Indexfeldes für " + sord.id + ".\n" + ex);
