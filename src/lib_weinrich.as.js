@@ -751,21 +751,29 @@ weinrich.as.Utils = {
     * var objKeyId = { "Betrag": "399.99" };
     * weinrich.as.Utils.setIndexfieldValueByParamList(sordId, objKeysObj);
     */
-    //TODO TESTE MICH
     setIndexfieldValueByParamList: function (sordId, objKeysObj) {
             
         try {
+            var sord = ixConnect.ix().checkoutSord(sordId, EditInfoC.mbAll, LockC.NO).sord;
+            
+            var paramKey;
+            for (paramKey in objKeysObj) {
 
-            var sord = this.getSordById(sordId);                
-            if (sord === undefined) throw "Error loading Sord...";
-
-            var key;
-            for (key in objKeysObj) {
-                ix.setIndexValueByName(sord, key, objKeysObj[key]);
+                var objKeys = sord.objKeys;
+                for (var i = 0; i < objKeys.length; i++) {
+                    var objKey = objKeys[i];
+                    if (objKey.name == paramKey) {
+                        objKey.data = [objKeysObj[paramKey]];
+                        break;
+                    }
+                }
             }
+            
+            ixConnect.ix().checkinSord(sord, SordC.mbAll, LockC.NO);
         }
         catch (ex) {
             this.logging(true, "Fehler beim Setzen des Wertes eines Indexfeldes für " + sord.id + ".\n" + ex);
+            ixConnect.ix().checkinSord(sord, SordC.mbAll, LockC.NO);
         }
     },
 
@@ -781,18 +789,25 @@ weinrich.as.Utils = {
     * var indexfieldValue = "499.99";
     * weinrich.as.Utils.setIndexfieldValueByName(sordId, indexfieldName, indexfieldValue);
     */
-    //TODO TESTE MICH
     setIndexfieldValueByName: function (sordId, objKeyName, objKeyValue) {
             
         try {
+            var sord = ixConnect.ix().checkoutSord(sordId, EditInfoC.mbAll, LockC.NO).sord;
+            
+            var objKeys = sord.objKeys;
+            for (var i = 0; i < objKeys.length; i++) {
+                var key = objKeys[i];
+                if (key.name == objKeyName) {
+                    key.data = [objKeyValue];
+                    break;
+                }
+            }
 
-            var sord = this.getSordById(sordId);                
-            if (sord === undefined) throw "Error loading Sord...";
-
-            ix.setIndexValueByName(sord, objKeyName, objKeyValue);
+            ixConnect.ix().checkinSord(sord, SordC.mbAll, LockC.NO);
         }
         catch (ex) {
             this.logging(true, "Fehler beim Setzen des Wertes eines Indexfeldes für " + sord.id + ".\n" + ex);
+            ixConnect.ix().checkinSord(sord, SordC.mbAll, LockC.NO);
         }
     },
 
