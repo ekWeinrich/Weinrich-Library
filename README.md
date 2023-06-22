@@ -37,6 +37,17 @@ Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="
 
 # Patchnotes
 
+Version 1.0.5 22.06.2023
+
+- Hinzugefügt: weinrich.as.Utils.setIndexfieldValueByName(sordId, indexfieldName, indexfieldValue);
+- Hinzugefügt: weinrich.as.Utils.setIndexfieldValueByParamList(sordId, objKeysObj);
+
+- Angepasst: importDocument: function (file, sordId, maskName, objKeysObj)
+    -> Neuer Methodenaufruf: weinrich.as.Utils.importDocument(file, sordId, maskName, objKeysObj, corruptFileDest);
+       Der neue Parameter corruptFileDest erwartet einen Pfad auf einen Ordner, in den korrupte/fehlerhafte Dateien verschoben werden,
+       sodass diese den nächsten Import nicht blockieren. Lässt man den Parameter weg oder leer, wird die Datei nicht verschoben.
+    -> Wurde die Datei nicht importiert (egal wieso), wird nun immer -1 zurückgegeben
+
 Version 1.0.4
 
 - Hinzugefügt: weinrich.as.Utils.getFolderIdFromParentByName(int parentId, string folderName)

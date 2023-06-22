@@ -12,7 +12,7 @@ weinrich.as = {};
  * @memberof weinrich.as
  * @namespace weinrich.as.Utils
  * @type {object}
- * @version release 1.0.3 
+ * @version release 1.0.5
  * - {@link https://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html ArrayList}
  */
 weinrich.as.Utils = {
@@ -102,39 +102,57 @@ weinrich.as.Utils = {
     /**
     * Importiert eine Datei in ELO.
     * @author   Erik Köhler - Weinrich
-    * @param    {File}      file       File der zu importierenden Datei
-    * @param    {int}       sordId     ObjId des Sords, in das die Datei importiert werden soll
-    * @param    {String}    maskName   Name der Maske, welche die Datei in ELO bekommen soll
-    * @param    {Object}    objKeysObj Indexfelder mit Werten, welche das Dokument bekommen soll
-    * @return   {int}                  ObjId des neuen Sords
+    * @param    {File}      file            File der zu importierenden Datei
+    * @param    {int}       sordId          ObjId des Sords, in das die Datei importiert werden soll
+    * @param    {String}    maskName        Name der Maske, welche die Datei in ELO bekommen soll
+    * @param    {Object}    objKeysObj      Indexfelder mit Werten, welche das Dokument bekommen soll
+    * @param    {String}    corruptFileDest Zielordner in den korrupte Dateien verschoben werden, welche nicht importiert werden können
+    * @return   {int}                       ObjId des neuen Sords
     * @example
     * var file = new File("C:\\temp\\tmp\\tmp1.pdf");
     * var sordId = 10186;
     * var maskId = "Freie Eingabe";
     * var objKeys = { "ELOSTATUS": "Imported" };
-    * var newObjId = weinrich.as.Utils.importDocument(file, sordId, maskId, objKeys);
+    * var corruptFileDest = "C:\\temp\\tmp\\Failed\\";
+    * var newObjId = weinrich.as.Utils.importDocument(file, sordId, maskId, objKeys, corruptFileDest);
     */
-    importDocument: function (file, sordId, maskName, objKeysObj) {
+    importDocument: function (file, sordId, maskName, objKeysObj, corruptFileDest) {
                 
-        try {           
-            this.logging(false, "Importiere: " + file.name);
-
-            if (!weinrich.as.FileUtils.fileOrDirectoryExists(file)) {
-                this.logging(false, "Datei wurde nicht gefunden.");
-                return false;
-            }
-
-            if (FileUtils.sizeOf(file) <= 0) {
-                this.logging(false, "Datei darf nicht leer sein.");
-                return false;
-            }
-
+        try {        
             var fileName = file.name;
+            
+            this.logging(false, "Importiere: " + fileName);
+
+            //Pruefe, ob die angegebene Datei existiert
+            if (!weinrich.as.FileUtils.fileOrDirectoryExists(file)) {
+                this.logging(false, "Datei wurde nicht gefunden...");
+                return -1;
+            }
+
+            //Verschiebe korrupte Dateien in den angegebenen Ordner
+            if (FileUtils.sizeOf(file) <= 10) {
+                this.logging(false, "Fehlerhafte Datei erkannt (" + fileName + ")...");
+
+                if (corruptFileDest && corruptFileDest.length > 0) {
+                    this.logging(false, "Verschiebe die Datei in den Ordner für fehlgeschlagene Dateien...");
+                                        
+                    try {
+                        var failedFolder = new File(corruptFileDest);
+                        weinrich.as.FileUtils.moveFileToDir(file, failedFolder, true);
+                    }
+                    catch (e) {
+                        this.logging(true, "Fehler beim verschieben der fehlerhaften Datei " + fileName + "\n" + e);                    
+                    }
+                }
+
+                return -1;
+            }
+
 
             //Schneide ab 128 Zeichen ab, da man sonst in einen Fehler läuft
             if (fileName.length > 127) {
                 fileName = fileName.substring(0,127);
-                this.logging(false, "Dateiname ist länger als 128 Zeichen. Er wurde gekürzt.");
+                this.logging(false, "Dateiname ist länger als 128 Zeichen. Er wurde gekürzt...");
             }
             
             objKeysObj[DocMaskLineC.NAME_FILENAME] = fileName;
@@ -715,13 +733,68 @@ weinrich.as.Utils = {
     getMapValue: function (sordId, mapName) {
         
         try {
-            return Packages.de.elo.mover.utils.ELOAsSordUtils.getMapValues(emConnect, sordId, mapName)[0];
+            return String(Packages.de.elo.mover.utils.ELOAsSordUtils.getMapValues(emConnect, sordId, mapName)[0]);
         }
         catch (ex) {
             this.logging(true, "Fehler beim Laden des Wertes eines Mapfeldes für " + sordId + ".\n" + ex);
             return undefined;
         }
 	},
+
+    /**
+    * Setze Indexfeldwerte eines Sords über ein Objekt mit Indexfeldname zu Wert Zuordnungen.
+    * @author   Erik Köhler - Weinrich
+    * @param    {Sord}      sord        Sord, für den der Wert des Indexfelds gesetzt werden soll
+    * @param    {Object}    objKeysObj  Name des Indexfeldes
+    * @example
+    * var sordId = 43544;
+    * var objKeyId = { "Betrag": "399.99" };
+    * weinrich.as.Utils.setIndexfieldValueByParamList(sordId, objKeysObj);
+    */
+    //TODO TESTE MICH
+    setIndexfieldValueByParamList: function (sordId, objKeysObj) {
+            
+        try {
+
+            var sord = this.getSordById(sordId);                
+            if (sord === undefined) throw "Error loading Sord...";
+
+            var key;
+            for (key in objKeysObj) {
+                ix.setIndexValueByName(ed.sord, key, objKeysObj[key]);
+            }
+        }
+        catch (ex) {
+            this.logging(true, "Fehler beim Setzen des Wertes eines Indexfeldes für " + sord.id + ".\n" + ex);
+        }
+    },
+
+    /**
+    * Setze den Indexfeldwert eines Sords über den Namen des Indexfeldes.
+    * @author   Erik Köhler - Weinrich
+    * @param    {Sord}      sord                Sord, für den der Wert des Indexfelds gesetzt werden soll
+    * @param    {String}    indexfieldName      Name des Indexfeldes
+    * @param    {String}    indexfieldValue     Zu setzender Wert des Indexfeldes
+    * @example
+    * var sordId = 43544;
+    * var indexfieldName = "Betrag";
+    * var indexfieldValue = "499.99";
+    * weinrich.as.Utils.setIndexfieldValueByName(sordId, indexfieldName, indexfieldValue);
+    */
+    //TODO TESTE MICH
+    setIndexfieldValueByName: function (sordId, objKeyName, objKeyValue) {
+            
+        try {
+
+            var sord = this.getSordById(sordId);                
+            if (sord === undefined) throw "Error loading Sord...";
+
+            ix.setIndexValueByName(ed.sord, objKeyName, objKeyValue);
+        }
+        catch (ex) {
+            this.logging(true, "Fehler beim Setzen des Wertes eines Indexfeldes für " + sord.id + ".\n" + ex);
+        }
+    },
 
     /**
     * Lade die Indexfeld-Werte eines Sords über die ObjKeyId des Indexfeldes.
@@ -741,7 +814,7 @@ weinrich.as.Utils = {
             var sord = this.getSordById(sordId);                
             if (sord === undefined) throw "Error loading Sord...";
 
-            return Packages.de.elo.mover.utils.ELOAsSordUtils.getObjKeyData(sord, objKeyId)[0];
+            return String(Packages.de.elo.mover.utils.ELOAsSordUtils.getObjKeyData(sord, objKeyId)[0]);
         }
         catch (ex) {
             this.logging(true, "Fehler beim Laden des Wertes eines Indexfeldes für " + sord.id + ".\n" + ex);
@@ -767,7 +840,7 @@ weinrich.as.Utils = {
             var sord = this.getSordById(sordId);            
             if (sord === undefined) throw "Error loading Sord...";
                 
-            return Packages.de.elo.mover.utils.ELOAsSordUtils.getObjKeyData(sord, objKeyGroupName)[0];
+            return String(Packages.de.elo.mover.utils.ELOAsSordUtils.getObjKeyData(sord, objKeyGroupName)[0]);
         }
         catch (ex) {
             this.logging(true, "Fehler beim Laden des Wertes eines Indexfeldes für " + sordId + ".\n" + ex);
@@ -801,7 +874,7 @@ weinrich.as.Utils = {
     * @return   {java.util.ArrayList<Sord>}             Alle Kind-Sords des Eltern-Sords
     * @example
     * var sordId = 43524;
-    * var path = weinrich.as.Utils.getSordPathById(sordId);
+    * var path = weinrich.as.Utils.getArcPathById(sordId);
     * var childSords = weinrich.as.Utils.getChildSordsByPath(path);
     */
     getChildSordsByPath: function (path) {	
@@ -845,7 +918,7 @@ weinrich.as.Utils = {
     * @return   {java.util.ArrayList<Sord>}             Alle Unterverzeichnisse des Sords
     * @example
     * var sordId = 43524;
-    * var path = weinrich.as.Utils.getSordPathById(sordId);
+    * var path = weinrich.as.Utils.getArcpathById(sordId);
     * var childFolderSords = weinrich.as.Utils.getChildFolderSordsByPath(path);
     */
     getChildFolderSordsByPath: function (path) {		
@@ -873,7 +946,7 @@ weinrich.as.Utils = {
     */
     getArcpathById: function (sordId) {	
         try {
-            return Packages.de.elo.mover.utils.ELOAsUtils.getElementPath(emConnect, sordId);
+            return String(Packages.de.elo.mover.utils.ELOAsUtils.getElementPath(emConnect, sordId));
         }
         catch (ex) {
             this.logging(true, "Fehler beim Bestimmen des ELO-Pfades von Sord " + sordId + ".\n" + ex);
@@ -909,7 +982,7 @@ weinrich.as.Utils = {
                 newEloPath = newEloPath.replace("¶¶", "¶");
             }
 
-            return newEloPath;
+            return String(newEloPath);
         }
         catch (ex) {
             this.logging(true, "Fehler beim Bestimmen des ELO-Pfades des Eltern-Sords von " + path + ".\n" + ex);
@@ -1100,7 +1173,7 @@ weinrich.as.Utils = {
     getArchiveName: function () {
             
         try {    
-            return Packages.de.elo.mover.utils.ELOAsUtils.getArchiveName(emConnect);
+            return String(Packages.de.elo.mover.utils.ELOAsUtils.getArchiveName(emConnect));
         }
         catch (ex) {
             this.logging(true, "Fehler beim Laden des Namens des Archivs.\n" + ex);
