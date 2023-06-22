@@ -37,7 +37,7 @@ Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="
 
 # Patchnotes
 
-**Version 1.0.5 - 22.06.2023**
+## Version 1.0.5 - 22.06.2023
 
 **Hinzugefügt:** weinrich.as.FilterUtils.getJSONStringByFindResult(findResult);
 - Gibt einen JSON-String zurück, der über das FindResult erstellt wurde.
@@ -53,6 +53,7 @@ Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="
 
 **Hinzugefügt:** weinrich.as.Utils.getFindResultByIndexfield(maskname, indexfeldName, indexfeldWert, numberOfResults);
 - Sucht nach Dokumenten einer Maske über den Wert eines Indexfeldes. Gibt das FindResult zurück.
+
 **Angepasst:** weinrich.as.Utils.getSordsByIndexfield(maskname, indexfeldName, indexfeldWert, numberOfResults);
 - Sucht nach Dokumenten einer Maske über den Wert eines Indexfeldes. Gibt das ein String[] zurück.
 
@@ -67,19 +68,19 @@ Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="
        sodass diese den nächsten Import nicht blockieren. Lässt man den Parameter weg oder leer, wird die Datei nicht verschoben.
     - Wurde die Datei nicht importiert (egal wieso), wird nun immer -1 zurückgegeben
 
-**Version 1.0.4**
+## Version 1.0.4
 
 **Hinzugefügt:** weinrich.as.Utils.getFolderIdFromParentByName(int parentId, string folderName)
 
-**Version 1.0.3**
+## Version 1.0.3
 
 **Hinzugefügt:** weinrich.as.Utils.deleteSordFinally(int sordid, bool folderMustBeEmpty)
 
-**Version 1.0.2**
+## Version 1.0.2
 
 **Angepasst:**: In FilterUtils jedes falsche "this" überarbeitet
 
-**Version 1.0.1**
+## Version 1.0.1
 
 **Hinzugefügt:** weinrich.as.Utils.renameSordById(int id, string name)
 **Hinzugefügt:** weinrich.as.Utils.arrIncludes(any[] arr, any value)
