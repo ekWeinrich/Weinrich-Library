@@ -761,7 +761,7 @@ weinrich.as.Utils = {
 
             var key;
             for (key in objKeysObj) {
-                ix.setIndexValueByName(ed.sord, key, objKeysObj[key]);
+                ix.setIndexValueByName(sord, key, objKeysObj[key]);
             }
         }
         catch (ex) {
