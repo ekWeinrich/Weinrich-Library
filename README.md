@@ -37,7 +37,16 @@ Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="
 
 # Patchnotes
 
-Version 1.0.5 22.06.2023
+Version 1.0.5 - 22.06.2023
+
+- Hinzugefügt: weinrich.as.FilterUtils.getJSONStringByFindResult(findResult);
+- Hinzugefügt: weinrich.as.Utils.createDynFolderByFindResult(parentId, folderName, findResult);
+
+- Hinzugefügt: weinrich.as.Utils.getFindResultByDocName(maskname, docname, numberOfResults);
+- Angepasst: weinrich.as.Utils.getSordsByDocName(maskname, docname, numberOfResults);
+
+- Hinzugefügt: weinrich.as.Utils.getFindResultByIndexfield(maskname, indexfeldName, indexfeldWert, numberOfResults);
+- Angepasst: weinrich.as.Utils.getSordsByIndexfield(maskname, indexfeldName, indexfeldWert, numberOfResults);
 
 - Hinzugefügt: weinrich.as.Utils.setIndexfieldValueByName(sordId, indexfieldName, indexfieldValue);
 - Hinzugefügt: weinrich.as.Utils.setIndexfieldValueByParamList(sordId, objKeysObj);

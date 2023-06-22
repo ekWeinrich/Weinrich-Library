@@ -87,7 +87,6 @@ weinrich.as.Utils = {
     * var arr = ["Fischer", "Caritas"];
     * var arrEnthaeltWert = weinrich.as.Utils.arrIncludes("Fischer");     
     */
-    // TODO Teste mich
     arrIncludes: function (arr, value) {
         
         if (arr) {
@@ -371,6 +370,50 @@ weinrich.as.Utils = {
 	},
 
     /**
+    * Lade das FindResult über die Suche nach Namen der Dokumente. Über die Maske einschränkbar.
+    * @author   Erik Köhler - Weinrich
+    * @param    {String}    maskname        Name der Maske, falls danach gefiltert werden soll. Ansonsten ""
+    * @param    {String}    docname         Kurzbezeichnung, nach der gesucht werden soll
+    * @param    {int}       numberOfResults Maximale Anzahl an Treffern, die gefunden werden können
+    * @return   {FindResult}                Gibt die gefundenen Sords als Array zurück
+    * @example
+    * var maskname = "Freie Eingabe";
+    * var docname = "Dokument";
+    * var numberOfResults = 100;       
+    * var findResult = weinrich.as.Utils.getFindResultByDocName(maskname, docname, numberOfResults);
+    */
+    getFindResultByDocName: function(maskname, docname, numberOfResults) {
+        var findInfo = new FindInfo();
+        var findByIndex = new FindByIndex();
+
+        //Wenn keine Maske angegeben wurde nur nach Kurzbezeichnung suchen
+        if (maskname != "") {
+            //Suche in bestimmter Maske...
+            findByIndex.maskId = maskname;			
+        }
+        
+        //...nach folgender Kurzbezeichnung
+        findByIndex.name = docname;
+
+        findInfo.setFindByIndex(findByIndex);
+
+        try {
+            var findResult = ixConnect.ix().findFirstSords(findInfo, numberOfResults, SordC.mbAllIndex);
+        }
+        catch (ex) {
+            // ! Error beim Suchen nach der Kurzbezeichnung
+            this.logging(true, ex);
+        }
+        finally {
+            if(findResult != null) {
+                ixConnect.ix().findClose(findResult.getSearchId());
+            }
+        }
+        
+        return findResult;
+    },
+
+    /**
     * Suche nach Dokumenten über die Kurzbezeichnung. Über die Maske einschränkbar.
     * @author   Erik Köhler - Weinrich
     * @param    {String}    maskname        Name der Maske, falls danach gefiltert werden soll. Ansonsten ""
@@ -384,39 +427,15 @@ weinrich.as.Utils = {
     * var sords = weinrich.as.Utils.getSordsByDocName(maskname, docname, numberOfResults);
     */
 	getSordsByDocName: function(maskname, docname, numberOfResults) {
-		var findInfo = new FindInfo();
-        var findByIndex = new FindByIndex();
+    
+        var findResult = weinrich.as.Utils.getFindResultByDocName(maskname, docname, numberOfResults);
+        var sords = findResult.getSords();
 
-		//Wenn keine Maske angegeben wurde nur nach Kurzbezeichnung suchen
-		if (maskname != "") {
-			//Suche in bestimmter Maske...
-			findByIndex.maskId = maskname;			
-		}
-        
-        //...nach folgender Kurzbezeichnung
-        findByIndex.name = docname;
-
-        findInfo.setFindByIndex(findByIndex);
-
-        try {
-            var findResult = ixConnect.ix().findFirstSords(findInfo, numberOfResults, SordC.mbAllIndex);
-            var sords = findResult.getSords();
-        }
-        catch (ex) {
-            // ! Error beim Suchen nach der Kurzbezeichnung
-            this.logging(true, ex);
-        }
-        finally {
-            if(findResult != null) {
-                ixConnect.ix().findClose(findResult.getSearchId());
-            }
-        }
-        
         return sords;
 	},
 
     /**
-    * Lade die Sords über die Suche nach Werten eines Indexfeldes
+    * Lade das FindResult über die Suche nach Werten eines Indexfeldes
     * @author   Erik Köhler - Weinrich
     * @param    {String}    maskname        Name der Maske, falls danach gefiltert werden soll
     * @param    {String}    indexfeldName   Indexfeld, in dem gesucht werden soll
@@ -428,10 +447,10 @@ weinrich.as.Utils = {
     * var indexfeldName = "BETRIEB";
     * var indexfeldWert = "Weinrich";
     * var numberOfResults = 100;       
-    * var sords = weinrich.as.Utils.getSordsByIndexfield(maskname, indexfeldName, indexfeldWert, numberOfResults);
+    * var findResult = weinrich.as.Utils.getFindResultByIndexfield(maskname, indexfeldName, indexfeldWert, numberOfResults);
     */
-    getSordsByIndexfield: function(maskname, indexfeldName, indexfeldWert, numberOfResults) {
-		var findInfo = new FindInfo();
+    getFindResultByIndexfield: function(maskname, indexfeldName, indexfeldWert, numberOfResults) {
+        var findInfo = new FindInfo();
         var findByIndex = new FindByIndex();
 
         //Suche in bestimmter Maske
@@ -452,10 +471,9 @@ weinrich.as.Utils = {
 
         try {
             var findResult = ixConnect.ix().findFirstSords(findInfo, numberOfResults, SordC.mbAllIndex);
-            var sords = findResult.getSords();
         }
         catch(ex) {
-			// ! Error beim Suchen mit Indexfeld
+            // ! Error beim Suchen mit Indexfeld
             this.logging(true, ex);
         }
         finally {
@@ -463,6 +481,29 @@ weinrich.as.Utils = {
                 ixConnect.ix().findClose(findResult.getSearchId());
             }
         }
+        
+        return findResult;
+    },
+
+    /**
+    * Lade die Sords über die Suche nach Werten eines Indexfeldes
+    * @author   Erik Köhler - Weinrich
+    * @param    {String}    maskname        Name der Maske, falls danach gefiltert werden soll
+    * @param    {String}    indexfeldName   Indexfeld, in dem gesucht werden soll
+    * @param    {String}    indexfeldWert   Wert des Indexfeldes, nach dem gesucht werden soll
+    * @param    {int}       numberOfResults Maximale Anzahl an Treffern, die gefunden werden können
+    * @return   {Sord[]}                    Gibt die gefundenen Sords als Array zurück
+    * @example
+    * var maskname = "MASKE";
+    * var indexfeldName = "BETRIEB";
+    * var indexfeldWert = "Weinrich";
+    * var numberOfResults = 100;
+    * var sords = weinrich.as.Utils.getSordsByIndexfield(maskname, indexfeldName, indexfeldWert, numberOfResults);
+    */
+    getSordsByIndexfield: function(maskname, indexfeldName, indexfeldWert, numberOfResults) {
+		
+        var findResult = this.getFindResultByIndexfield(maskname, indexfeldName, indexfeldWert, numberOfResults);
+        var sords = findResult.getSords();
         
         return sords;
     },
@@ -690,6 +731,42 @@ weinrich.as.Utils = {
         }
         catch (ex) {
             this.logging(true, "Fehler beim Erstellen eines Feed-Eintrags für " + sordId + ".\n" + ex);
+            return false;
+        }
+    },
+    
+    /**
+    * Erstelle einen neuen dyn. Ordner mit den Suchoptionen aus dem FindResult in dem angegebenen Eltern-Verzeichnis
+    * @author   Erik Köhler - Weinrich
+    * @param    {int}           parentId    ObjId des Sords, für das ein Feed-Eintrag geschrieben werden soll
+    * @param    {FindResult}    findResult  Suchergebnis, über das der dyn. Ordnerangelegt werden solgetSordByIdl
+    * @return   {bool}                      True, wenn Feed-Eintrag erfolgreich geschrieben wurde
+    * @example
+    * var parentId = 43544;
+    * var maskname = "CROSS-Belege";
+    * var indexfeldName = "BETRIEB";
+    * var indexfeldWert = "Weinrich";
+    * var numberOfResults = 100;      
+    * var dynFolderName = "Test dyn. Folder"; 
+    * var findResult = weinrich.as.Utils.getFindResultByIndexfield(maskname, indexfeldName, indexfeldWert, numberOfResults);
+    * weinrich.as.Utils.createDynFolderByFindResult(parentId, folderName, findResult);
+    */
+	createDynFolderByFindResult: function(parentId, folderName, findResult) {
+        try {
+            var json = weinrich.as.FilterUtils.getJSONStringByFindResult(findResult);
+
+            var newFolderId = this.createFolderByParentId(parentId, folderName, "Ordner");
+
+            var sord = ixConnect.ix().checkoutSord(newFolderId, EditInfoC.mbAll, LockC.NO).sord;
+            
+            sord.desc = json
+            
+            ixConnect.ix().checkinSord(sord, SordC.mbAll, LockC.NO);
+
+            return true;
+        }
+        catch (ex) {
+            this.logging(true, "Fehler beim Erstellen des dyn. Ordners in " + parentId + ".\n" + ex);
             return false;
         }
 	},
@@ -1489,6 +1566,24 @@ weinrich.as.Utils = {
  * @version release 1.0.0 
  */
  weinrich.as.FilterUtils = {
+     
+    /**
+    * Gibt einen JSON-String zurück, der mit einer Suchabfrage generiert wurde. 
+    * @author   Erik Köhler - Weinrich
+    * @param    {FindResult}    findResult      Suchergebnis einer FindInfo Abfrage
+    * @return   {String}                        JSON für den Zusatztext eines dyn. Ordners
+    * @example
+    * var maskname = "MASKE";
+    * var indexfeldName = "BETRIEB";
+    * var indexfeldWert = "Weinrich";
+    * var numberOfResults = 100;       
+    * var findResult = weinrich.as.Utils.getFindResultByIndexfield(maskname, indexfeldName, indexfeldWert, numberOfResults);
+    * var dynFolderJSON = weinrich.as.FilterUtils.getJSONStringByFindResult(findResult);
+    */
+    getJSONStringByFindResult: function(findResult) {
+       
+        return findResult.dynamicFolder;
+    },
      
     /**
     * Filtert die übergebene ArrayList nach Sords, dessen Kurzbezeichnung den Filterwert enthält.
@@ -2458,7 +2553,7 @@ weinrich.as.FileUtils = {
  * @type {object}
  * @version release 1.0.0 
  */
-//TODO Test ich
+//TODO Test mich
 weinrich.as.WorkflowUtils = {
      
     /**
