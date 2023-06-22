@@ -39,51 +39,47 @@ Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="
 
 **Version 1.0.5 - 22.06.2023**
 
-- **Hinzugefügt:** weinrich.as.FilterUtils.getJSONStringByFindResult(findResult);
+**Hinzugefügt:** weinrich.as.FilterUtils.getJSONStringByFindResult(findResult);
+- Gibt einen JSON-String zurück, der über das FindResult erstellt wurde.
 
-Gibt einen JSON-String zurück, der über das FindResult erstellt wurde.
+**Hinzugefügt:** weinrich.as.Utils.createDynFolderByFindResult(parentId, folderName, findResult);
+- Erstellt einen dynamischen Ordner über das FindResult.
 
-- **Hinzugefügt:** weinrich.as.Utils.createDynFolderByFindResult(parentId, folderName, findResult);
+**Hinzugefügt:** weinrich.as.Utils.getFindResultByDocName(maskname, docname, numberOfResults);
+- Sucht nach Dokumenten einer Maske über deren Kurzbezeichnung. Gibt das FindResult zurück.
 
-Erstellt einen dynamischen Ordner über das FindResult.
+**Angepasst:** weinrich.as.Utils.getSordsByDocName(maskname, docname, numberOfResults);
+- Sucht nach Dokumenten einer Maske über deren Kurzbezeichnung. Gibt das ein String[] zurück.
 
-- **Hinzugefügt:** weinrich.as.Utils.getFindResultByDocName(maskname, docname, numberOfResults);
+**Hinzugefügt:** weinrich.as.Utils.getFindResultByIndexfield(maskname, indexfeldName, indexfeldWert, numberOfResults);
+- Sucht nach Dokumenten einer Maske über den Wert eines Indexfeldes. Gibt das FindResult zurück.
+**Angepasst:** weinrich.as.Utils.getSordsByIndexfield(maskname, indexfeldName, indexfeldWert, numberOfResults);
+- Sucht nach Dokumenten einer Maske über den Wert eines Indexfeldes. Gibt das ein String[] zurück.
 
-Sucht nach Dokumenten einer Maske über deren Kurzbezeichnung. Gibt das FindResult zurück.
+**Hinzugefügt:** weinrich.as.Utils.setIndexfieldValueByName(sordId, indexfieldName, indexfieldValue);
+- Setzt den Wert des Indexfeldes eines Sords über den Namen des Indexfeldes
+**Hinzugefügt:** weinrich.as.Utils.setIndexfieldValueByParamList(sordId, objKeysObj);
+- Setzt Werte des Indexfeldes eines Sords über ein Objekt (z.B. {"BETRAG": "499.50"})
 
-- **Angepasst:** weinrich.as.Utils.getSordsByDocName(maskname, docname, numberOfResults);
-
-Sucht nach Dokumenten einer Maske über deren Kurzbezeichnung. Gibt das ein String[] zurück.
-
-- **Hinzugefügt:** weinrich.as.Utils.getFindResultByIndexfield(maskname, indexfeldName, indexfeldWert, numberOfResults);
-Sucht nach Dokumenten einer Maske über den Wert eines Indexfeldes. Gibt das FindResult zurück.
-- **Angepasst:** weinrich.as.Utils.getSordsByIndexfield(maskname, indexfeldName, indexfeldWert, numberOfResults);
-Sucht nach Dokumenten einer Maske über den Wert eines Indexfeldes. Gibt das ein String[] zurück.
-
-- **Hinzugefügt:** weinrich.as.Utils.setIndexfieldValueByName(sordId, indexfieldName, indexfieldValue);
-Setzt den Wert des Indexfeldes eines Sords über den Namen des Indexfeldes
-- **Hinzugefügt:** weinrich.as.Utils.setIndexfieldValueByParamList(sordId, objKeysObj);
-Setzt Werte des Indexfeldes eines Sords über ein Objekt (z.B. {"BETRAG": "499.50"})
-
-- **Angepasst:** importDocument: function (file, sordId, maskName, objKeysObj)
-    -> Neuer Methodenaufruf: weinrich.as.Utils.importDocument(file, sordId, maskName, objKeysObj, corruptFileDest);
+**Angepasst:** importDocument: function (file, sordId, maskName, objKeysObj)
+    - Neuer Methodenaufruf: weinrich.as.Utils.importDocument(file, sordId, maskName, objKeysObj, corruptFileDest);
        Der neue Parameter corruptFileDest erwartet einen Pfad auf einen Ordner, in den korrupte/fehlerhafte Dateien verschoben werden,
        sodass diese den nächsten Import nicht blockieren. Lässt man den Parameter weg oder leer, wird die Datei nicht verschoben.
-    -> Wurde die Datei nicht importiert (egal wieso), wird nun immer -1 zurückgegeben
+    - Wurde die Datei nicht importiert (egal wieso), wird nun immer -1 zurückgegeben
 
-Version 1.0.4
+**Version 1.0.4**
 
-- Hinzugefügt: weinrich.as.Utils.getFolderIdFromParentByName(int parentId, string folderName)
+**Hinzugefügt:** weinrich.as.Utils.getFolderIdFromParentByName(int parentId, string folderName)
 
-Version 1.0.3
+**Version 1.0.3**
 
-- Hinzugefügt: weinrich.as.Utils.deleteSordFinally(int sordid, bool folderMustBeEmpty)
+**Hinzugefügt:** weinrich.as.Utils.deleteSordFinally(int sordid, bool folderMustBeEmpty)
 
-Version 1.0.2
+**Version 1.0.2**
 
-- In FilterUtils jedes falsche "this" überarbeitet
+**Angepasst:**: In FilterUtils jedes falsche "this" überarbeitet
 
-Version 1.0.1
+**Version 1.0.1**
 
-- Hinzugefügt: weinrich.as.Utils.renameSordById(int id, string name)
-- Hinzugefügt: weinrich.as.Utils.arrIncludes(any[] arr, any value)
+**Hinzugefügt:** weinrich.as.Utils.renameSordById(int id, string name)
+**Hinzugefügt:** weinrich.as.Utils.arrIncludes(any[] arr, any value)
