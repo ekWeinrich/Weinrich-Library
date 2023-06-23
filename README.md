@@ -63,11 +63,9 @@ Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="
 **Hinzugefügt:** weinrich.as.Utils.setIndexfieldValueByParamList(sordId, objKeysObj);
 - Setzt Werte des Indexfeldes eines Sords über ein Objekt (z.B. {"BETRAG": "499.50"})
 
-**Angepasst:** importDocument: function (file, sordId, maskName, objKeysObj)
-    - Neuer Methodenaufruf: weinrich.as.Utils.importDocument(file, sordId, maskName, objKeysObj, corruptFileDest);
-       Der neue Parameter corruptFileDest erwartet einen Pfad auf einen Ordner, in den korrupte/fehlerhafte Dateien verschoben werden,
-       sodass diese den nächsten Import nicht blockieren. Lässt man den Parameter weg oder leer, wird die Datei nicht verschoben.
-    - Wurde die Datei nicht importiert (egal wieso), wird nun immer -1 zurückgegeben
+**Angepasst:** weinrich.as.Utils.importDocument(file, sordId, maskName, objKeysObj, corruptFileDest);
+- Neuer Methodenaufruf: Der neue Parameter corruptFileDest erwartet einen Pfad auf einen Ordner, in den korrupte/fehlerhafte Dateien verschoben werden,
+sodass diese den nächsten Import nicht blockieren. Lässt man den Parameter weg oder leer, wird die Datei nicht verschoben. Wurde die Datei nicht importiert wird nun immer -1 zurückgegeben
 
 ## Version 1.0.4
 
