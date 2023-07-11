@@ -9,9 +9,10 @@
     "plugins": ["plugins/markdown"],
     "source": {
         "include": [
-        "src"
+        "src",
+        "Tutorials"
         ],
-        "includePattern": ".+\\.js(doc)?$|.+\\.md(doc)?$",
+        "includePattern": ".+\\.js(doc)?$|.+\\.md?$",
         "excludePattern": "(^|\\/|\\\\)_"
     },
     "opts": {
@@ -29,7 +30,7 @@
             "menu": [
                 {
                     "title": "Google",
-                    "link": "./docs/turorial-Lifehacks.html",
+                    "link": "./docs/tutorial-Lifehacks.html",
                     "id": "google"
                 }
             ]
