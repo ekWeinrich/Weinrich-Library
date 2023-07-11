@@ -11,7 +11,7 @@
         "include": [
         "src"
         ],
-        "includePattern": ".+\\.js(doc)?$",
+        "includePattern": ".+\\.js(doc)?$|.+\\.md(doc)?$",
         "excludePattern": "(^|\\/|\\\\)_"
     },
     "opts": {
@@ -19,12 +19,12 @@
         "template": "./node_modules/clean-jsdoc-theme",
         "destination": "./docs/",
         "readme": "./README.md",
+        "tutorials": "./Tutorials",
         "recurse": true,
         "verbose": true,
         "base_url": "https://ekweinrich.github.io/Weinrich-Library//",
         "theme_opts": {
             "default_theme": "dark",
-            "footer": "This is a footer",
             "homepageTitle": "ELO Library - Weinrich",
             "menu": [
                 {
