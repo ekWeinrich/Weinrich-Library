@@ -2,7 +2,7 @@
 
 Willkommen bei der `Weinrich-Library`. Hier wird generischer Code für ELO-Projekte bereitsgestellt.
 
-Hier geht es zu den Lifehacks für AS-Regeln: [Lifehacks](./Lifehacks.md)
+Hier geht es zu den Lifehacks für AS-Regeln: <a href="https://ekweinrich.github.io/Weinrich-Library/turorial-Lifehacks.html">Lifehacks</a>
 
 Integrierte Funktionen:
 
