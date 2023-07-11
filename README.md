@@ -40,6 +40,12 @@ Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="
 
 # Patchnotes
 
+## Version 1.0.6 - 11.07.2023
+
+**Hinzugefügt:** Menüeintrag 'Tutorials' mit der Möglichkeit verschiedene Anleitungen zu hinterlegen
+
+**Hinzugefügt:** 'Lifehacks' in 'Tutorials' angelegt. Darin allgemeine Hilfestellungen allgemein zu AS-Regeln
+
 ## Version 1.0.5 - 22.06.2023
 
 **Hinzugefügt:** weinrich.as.FilterUtils.getJSONStringByFindResult(findResult);
