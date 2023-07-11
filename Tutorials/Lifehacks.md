@@ -1,5 +1,3 @@
-# Weinrich-Library Lifehacks
-
 Willkommen bei den Lifehacks der `Weinrich-Library`. Hier werden Funktionen vorgestellt, die Ihnen die Arbeit mit oder ohne Library vereinfachen sollen.
 
 # AS-Regeln de-/aktivieren
@@ -13,16 +11,16 @@ aus der AS-Regel rausspringt.
 
 Beipielcode:
 
-const AS_REGEL_IS_ACTIVE = false;
+    const AS_REGEL_IS_ACTIVE = false;
 
-var lifehack = {
+    var lifehack = {
 
-    main: function () {
-        return AS_REGEL_IS_ACTIVE;
-        
-        //Hier kommt man nur hin, wenn AS_REGEL_IS_ACTIVE == true
-        log.info("Lifehack");
-    }
-};
+        main: function () {
+            return AS_REGEL_IS_ACTIVE;
+            
+            //Hier kommt man nur hin, wenn AS_REGEL_IS_ACTIVE == true
+            log.info("Lifehack");
+        }
+    };
 
-lifehack.main();
+    lifehack.main();
