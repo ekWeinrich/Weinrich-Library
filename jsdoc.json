@@ -30,7 +30,7 @@
             "menu": [
                 {
                     "title": "Google",
-                    "link": "./docs/tutorial-Lifehacks.html",
+                    "link": "https://www.google.com/",
                     "id": "google"
                 }
             ]
