@@ -12,7 +12,7 @@
         "src",
         "Tutorials"
         ],
-        "includePattern": ".+\\.js(doc)?$|.+\\.md?$",
+        "includePattern": ".+\\.js(doc)?$",
         "excludePattern": "(^|\\/|\\\\)_"
     },
     "opts": {
