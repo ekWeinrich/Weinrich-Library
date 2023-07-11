@@ -28,9 +28,9 @@
             "homepageTitle": "ELO Library - Weinrich",
             "menu": [
                 {
-                    "title": "Google",
-                    "link": "https://www.google.com/",
-                    "id": "google"
+                    "title": "Lifehacks",
+                    "link": "https://ekweinrich.github.io/Weinrich-Library/Lifehacks",
+                    "id": "lifehacks"
                 }
             ]
         }
