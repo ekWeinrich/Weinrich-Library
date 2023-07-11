@@ -16,7 +16,7 @@ Beipielcode:
     var lifehack = {
 
         main: function () {
-            if(!AS_REGEL_IS_ACTIVE) return;;
+            if(!AS_REGEL_IS_ACTIVE) return;
             
             //Hier kommt man nur hin, wenn AS_REGEL_IS_ACTIVE == true
             log.info("Lifehack");
