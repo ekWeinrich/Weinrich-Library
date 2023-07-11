@@ -24,12 +24,13 @@
         "base_url": "https://ekweinrich.github.io/Weinrich-Library//",
         "theme_opts": {
             "default_theme": "dark",
+            "footer": "This is a footer",
             "homepageTitle": "ELO Library - Weinrich",
             "menu": [
                 {
-                    "title": "Lifehacks",
-                    "link": "./Lifehacks.md",
-                    "id": "lifehacks"
+                    "title": "Google",
+                    "link": "https://www.google.com/",
+                    "id": "google"
                 }
             ]
         }

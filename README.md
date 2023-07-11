@@ -2,12 +2,15 @@
 
 Willkommen bei der `Weinrich-Library`. Hier wird generischer Code für ELO-Projekte bereitsgestellt.
 
+Hier geht es zu den Lifehacks für AS-Regeln: [Lifehacks](./Lifehacks.md)
+
 Integrierte Funktionen:
 
 1. Zeit- und Datumsfunktionen
 2. Funktionen auf Dateiebene
 3. Funktionen für ELO
 4. Logging
+5. Filterfunktionen
 
 # Einbindung in eine AS-Regel
 
