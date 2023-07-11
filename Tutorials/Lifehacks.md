@@ -6,7 +6,7 @@ Man kann mit wenig Code eine AS-Regel de-/aktivierbar machen.
 
 Schritt 1: Erstelle eine boolsche Konstante, die in etwa heißt wie 'AS_REGEL_IS_ACTIVE' und setze sie standardmäßig auf TRUE.
 
-Schritt 2: Setze am Anfang der main-Funktion 'return AS_REGEL_IS_ACTIVE;'. Dies sorgt dafür, dass wenn die Konstante auf FALSE gesetzt wurde, man sofort
+Schritt 2: Pruefe am Anfang der main-Funktion AS_REGEL_IS_ACTIVE auf FALSE. Dies sorgt dafür, dass wenn die Konstante auf FALSE gesetzt wurde, man sofort
 aus der AS-Regel rausspringt.
 
 Beipielcode:
