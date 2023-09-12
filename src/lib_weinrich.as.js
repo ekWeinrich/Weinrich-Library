@@ -149,8 +149,8 @@ weinrich.as.Utils = {
 
 
             //Schneide ab 128 Zeichen ab, da man sonst in einen Fehler läuft
-            if (fileName.length > 127) {
-                fileName = fileName.substring(0,127);
+            if (fileName.length > 120) {
+                fileName = fileName.substring(0,120);
                 this.logging(false, "Dateiname ist länger als 128 Zeichen. Er wurde gekürzt...");
             }
             
