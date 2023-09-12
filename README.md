@@ -42,6 +42,10 @@ Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="
 
 ## Version 1.0.6 - 11.07.2023
 
+**Angepasst:** weinrich.as.Utils.importDocument Bugfix: Länge des Dateinamen wird nun korrekt geprüft und gekürzt
+
+## Version 1.0.6 - 11.07.2023
+
 **Hinzugefügt:** Menüeintrag 'Tutorials' mit der Möglichkeit verschiedene Anleitungen zu hinterlegen
 
 **Hinzugefügt:** 'Lifehacks' in 'Tutorials' angelegt. Darin allgemeine Hilfestellungen allgemein zu AS-Regeln

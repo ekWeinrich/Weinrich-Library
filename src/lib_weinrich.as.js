@@ -12,7 +12,7 @@ weinrich.as = {};
  * @memberof weinrich.as
  * @namespace weinrich.as.Utils
  * @type {object}
- * @version release 1.0.6
+ * @version release 1.0.7
  * - {@link https://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html ArrayList}
  */
 weinrich.as.Utils = {
@@ -147,10 +147,11 @@ weinrich.as.Utils = {
                 return -1;
             }
 
+            this.logging(false, "Dateiname ist " + fileName.length() + " Zeichen lang...");
 
             //Schneide ab 128 Zeichen ab, da man sonst in einen Fehler läuft
-            if (fileName.length > 120) {
-                fileName = fileName.substring(0,120);
+            if (fileName.length() > 127) {
+                fileName =  fileName.substring(0,127);
                 this.logging(false, "Dateiname ist länger als 128 Zeichen. Er wurde gekürzt...");
             }
             
