@@ -40,7 +40,7 @@ Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="
 
 # Patchnotes
 
-## Version 1.0.6 - 11.07.2023
+## Version 1.0.7 - 12.09.2023
 
 **Angepasst:** weinrich.as.Utils.importDocument Bugfix: Länge des Dateinamen wird nun korrekt geprüft und gekürzt
 
