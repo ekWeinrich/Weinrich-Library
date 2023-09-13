@@ -33,7 +33,7 @@ True/False stehen hier für Debug-Modus. Bei True wird immer ein Logeintrag gesc
 Danach kann folgendermaßen geloggt werden:
 weinrich.as.Utils.logging(false, "Dies ist ein Dummy-Logeintrag");
 True/False stehen hier für Prioritätslog. Bei True wird immer ein Logeintrag geschrieben, auch wenn man nicht im Debug-Modus ist.
-
+ 
 
 Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="https://github.com/ekWeinrich/Weinrich-Library/issues">hier</a> 
 übermittelt werden.
