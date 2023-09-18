@@ -892,7 +892,7 @@ weinrich.as.Utils = {
     /**
     * Lade die Indexfeld-Werte eines Sords über die ObjKeyId des Indexfeldes.
     * @author   Erik Köhler - Weinrich
-    * @param    {Sord}      sord       Sord, aus dem der Wert des Indexfelds geladen werden soll
+    * @param    {int}       sordId      ID des Sords, aus dem der Wert des Indexfelds geladen werden soll
     * @param    {int}       objKeyId    ObjKeyId des Indexfeldes
     * @return   {String}                Wert des Indexfeldes, bei Fehler undefined
     * @example
@@ -918,7 +918,7 @@ weinrich.as.Utils = {
     /**
     * Lade die Indexfeld-Werte eines Sords über den Namen des Indexfeldes.
     * @author   Erik Köhler - Weinrich
-    * @param    {Sord}      sord                Sord, aus dem der Wert des Indexfelds geladen werden soll
+    * @param    {int}       sordId              ID des Sords, aus dem der Wert des Indexfelds geladen werden soll
     * @param    {String}    objKeyGroupName     Name des Indexfeldes
     * @return   {String}                        Wert des Indexfeldes, bei Fehler undefined
     * @example
