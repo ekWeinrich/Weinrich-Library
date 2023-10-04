@@ -2390,19 +2390,18 @@ weinrich.as.FileUtils = {
     * @return   {File[]}                Gibt die Dateien mit den übergebenen Dateiendungen zurück. Undefined, wenn Pfad nicht existiert
     */
     getFilesFromDirectory: function (srcPath, extensions, recursive) {
-            
-        if (!this.fileOrDirectoryExists(srcPath)) {
-            weinrich.as.Utils.logging(true, "ERROR loading files from path. Path (" + srcPath + ") doesn't exist...");
-            return undefined;
-        }
-
+        
         try {
+            if (!this.fileOrDirectoryExists(srcPath)) {
+                weinrich.as.Utils.logging(true, "ERROR loading files from path. Path (" + srcPath + ") doesn't exist...");
+                return undefined;
+            }
 
             var ext = java.util.Arrays.asList(extensions);
 
             var files = FileUtils.convertFileCollectionToFileArray(FileUtils.listFiles(
                 new File(srcPath),
-                extensions ? new SuffixFileFilter(extensions, IOCase.INSENSITIVE) : TrueFileFilter.INSTANCE,
+                extensions ? new SuffixFileFilter(ext, IOCase.INSENSITIVE) : TrueFileFilter.INSTANCE,
                 recursive ? TrueFileFilter.INSTANCE : FalseFileFilter.INSTANCE)
             );
     
