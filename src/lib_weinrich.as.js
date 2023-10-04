@@ -2378,6 +2378,41 @@ weinrich.as.FileUtils = {
             
         return file.exists();
     },
+
+    /**
+    * Lädt die Dateien
+    * @author   Erik Köhler - Weinrich
+    * @memberof weinrich.as.FileUtils
+    * @method   getFilesFromDirectory
+    * @param    {String}    srcPath     Pfad des Ordners, aus dem die Dateien geladen werden sollen
+    * @param    {String[]}  extensions  Dateiendungen, nach denen gefiltert wird. Z.B.: [".pdf"]
+    * @param    {Boolean}   recursive   Legt fest, ob auch die Deatein aus den Unterordnern
+    * @return   {File[]}                Gibt die Dateien mit den übergebenen Dateiendungen zurück. Undefined, wenn Pfad nicht existiert
+    */
+    getFilesFromDirectory: function (srcPath, extensions, recursive) {
+            
+        if (!this.fileOrDirectoryExists(srcPath)) {
+            weinrich.as.Utils.logging(true, "ERROR loading files from path. Path (" + srcPath + ") doesn't exist...");
+            return undefined;
+        }
+
+        try {
+
+            var ext = java.util.Arrays.asList(extensions);
+
+            var files = FileUtils.convertFileCollectionToFileArray(FileUtils.listFiles(
+                new File(srcPath),
+                extensions ? new SuffixFileFilter(extensions, IOCase.INSENSITIVE) : TrueFileFilter.INSTANCE,
+                recursive ? TrueFileFilter.INSTANCE : FalseFileFilter.INSTANCE)
+            );
+    
+            return files;
+        }
+        catch (e) {
+            weinrich.as.Utils.logging(true, "ERROR loading files from path.\n" + e);
+            return undefined;
+        }
+    },
         
     /**
     * Prüft, ob der übergebene Pfad auf ein Verzeichnis verweist.
