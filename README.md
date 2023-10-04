@@ -40,6 +40,11 @@ Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="
 
 # Patchnotes
 
+## Version 1.0.8 - 04.10.2023
+
+**Hinzugefügt:** weinrich.as.FileUtils.getFilesFromDirectory(srcPath, extensions, recursive);
+    - Gibt die Dateien aus einem Ordner gefiltert nach übergebenen Dateiendungen zurück
+
 ## Version 1.0.7 - 12.09.2023
 
 **Angepasst:** weinrich.as.Utils.importDocument Bugfix: Länge des Dateinamen wird nun korrekt geprüft und gekürzt

@@ -2380,7 +2380,7 @@ weinrich.as.FileUtils = {
     },
 
     /**
-    * Lädt die Dateien
+    * Gibt die Dateien mit den übergebenen Dateiendungen zurück.
     * @author   Erik Köhler - Weinrich
     * @memberof weinrich.as.FileUtils
     * @method   getFilesFromDirectory
@@ -2388,11 +2388,18 @@ weinrich.as.FileUtils = {
     * @param    {String[]}  extensions  Dateiendungen, nach denen gefiltert wird. Z.B.: [".pdf"]
     * @param    {Boolean}   recursive   Legt fest, ob auch die Deatein aus den Unterordnern
     * @return   {File[]}                Gibt die Dateien mit den übergebenen Dateiendungen zurück. Undefined, wenn Pfad nicht existiert
+    * @example
+    *  var srcPath = "c:\\PdfOrdner";
+    *  var extensions = ['.pdf'];
+    *  var recursive = false;
+    *  var files = weinrich.as.FileUtils.getFilesFromDirectory(srcPath,extensions,recursive);
     */
     getFilesFromDirectory: function (srcPath, extensions, recursive) {
         
         try {
-            if (!this.fileOrDirectoryExists(srcPath)) {
+            var srcDir = new File(srcPath);
+
+            if (!this.fileOrDirectoryExists(srcDir)) {
                 weinrich.as.Utils.logging(true, "ERROR loading files from path. Path (" + srcPath + ") doesn't exist...");
                 return undefined;
             }
@@ -2400,7 +2407,7 @@ weinrich.as.FileUtils = {
             var ext = java.util.Arrays.asList(extensions);
 
             var files = FileUtils.convertFileCollectionToFileArray(FileUtils.listFiles(
-                new File(srcPath),
+                srcDir,
                 extensions ? new SuffixFileFilter(ext, IOCase.INSENSITIVE) : TrueFileFilter.INSTANCE,
                 recursive ? TrueFileFilter.INSTANCE : FalseFileFilter.INSTANCE)
             );
