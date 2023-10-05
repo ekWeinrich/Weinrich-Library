@@ -200,8 +200,9 @@ weinrich.as.Utils = {
     changeMask: function (sordId, maskName) {
             
         try {    
-            var currentSord = this.getSordById(sordId);
+            var currentSord = ixConnect.ix().checkoutSord(sordId, EditInfoC.mbSord, LockC.NO).sord; 
             var changedSord = sol.common.SordUtils.changeMask(currentSord, maskName);
+            ixConnect.ix().checkinSord(changedSord, SordC.mbAll, LockC.NO);
             return changedSord;
         }
         catch (ex) {
