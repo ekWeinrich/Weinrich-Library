@@ -1,4 +1,4 @@
-# Weinrich-Library v1.0.7
+# Weinrich-Library v1.0.8
 
 Willkommen bei der `Weinrich-Library`. Hier wird generischer Code für ELO-Projekte bereitsgestellt.
 
@@ -19,6 +19,9 @@ Damit die Bibliothek lauffähig ist, müssen folgende ELO-Bibliotheken inkludier
 - lib_Class
 - ix: IndexServer Functions
 - fu: File Utils
+- wf: Workflow Utils
+- lib_sol.common.WfUtils
+- lib_sol.common.SordUtils
 
 Und natürlich die Bibliothek selber:
 
@@ -42,8 +45,13 @@ Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="
 
 ## Version 1.0.8 - 04.10.2023
 
+**Include hinzugefügt:**  lib_sol.common.SordUtils
+
 **Hinzugefügt:** weinrich.as.FileUtils.getFilesFromDirectory(srcPath, extensions, recursive);
     - Gibt die Dateien aus einem Ordner gefiltert nach übergebenen Dateiendungen zurück
+
+**Hinzugefügt:** weinrich.as.Utils.changeMask(sordId, maskName);
+    - Ändert die Maske des Sords (wahlweise über den Namen oder die Id der Maske)
 
 ## Version 1.0.7 - 12.09.2023
 

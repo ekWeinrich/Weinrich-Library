@@ -190,6 +190,27 @@ weinrich.as.Utils = {
   	},
 
     /**
+    * Ändere die Maske des Sords
+    * @author   Erik Köhler - Weinrich
+    * @param    {int}       sordId      ObjId des Sords
+    * @param    {String}    maskName    Name oder Id der neuen Maske
+    * @return   {Sord}                  Gibt das geänderte Sord zurück
+    * @version added 1.0.8 
+    */
+    changeMask: function (sordId, maskName) {
+            
+        try {    
+            var currentSord = this.getSordById(sordId);
+            var changedSord = sol.common.SordUtils.changeMask(currentSord, maskName);
+            return changedSord;
+        }
+        catch (ex) {
+            this.logging(true, "Fehler beim Ändern der Maske des Sords (" + sordId + ").\n" + ex);
+            return undefined;
+        }
+    },
+
+    /**
     * Benenne das Sord über die ObjId um.
     * @author   Erik Köhler - Weinrich
     * @param    {int}       sordId      ObjId, des zu umzubenennenden Sords
