@@ -43,7 +43,7 @@ Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="
 
 # Patchnotes
 
-## Version 1.0.8 - 04.10.2023
+## Version 1.0.8 - 05.10.2023
 
 **Include hinzugefügt:**  lib_sol.common.SordUtils
 
