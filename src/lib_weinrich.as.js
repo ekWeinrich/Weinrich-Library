@@ -1935,6 +1935,54 @@ weinrich.as.Utils = {
 weinrich.as.DateUtils = {
 
     /**
+    * Konvertiert den übergebenen ISO-Datum-String in ein Date Objekt und gibt diese zurück
+    * @author   Erik Köhler - Weinrich
+    * @param    {String}    date            Datum als String im ISO-Format
+    * @param    {Boolean}   withoutTime     Gibt an, ob die Zeit genullt werden soll
+    * @return   {Date}                      Konvertiertes Datum. Bei Fehler undefined.
+    */
+    convertIsoToDate: function (iso, withoutTime) {	
+        try {
+
+            if (!Packages.de.elo.mover.utils.ELOAsDateUtils.isValidIsoDate(iso)) {
+                weinrich.as.Utils.logging(true, "Das ISO-Datum war nicht valide und konnte nicht konvertiert werden.\n" + ex);
+                return undefined;
+            }
+
+            var newDate = Packages.de.elo.mover.utils.ELOAsDateUtils.dateFromIso(iso);	
+
+            if(withoutTime)
+                Packages.de.elo.mover.utils.ELOAsDateUtils.getDateWithoutTime(newDate);
+
+            return newDate;
+        }
+        catch (ex) {
+            weinrich.as.Utils.logging(true, "Fehler beim Konvertieren des ISO-Datums.\n" + ex);
+            return undefined;
+        }
+    },
+
+    /**
+    * Konvertiert das übergebene Date-Objekt zu einem ISO-Datum-String und gibt diesen zurück
+    * @author   Erik Köhler - Weinrich
+    * @param    {Date}      date            Datum welches zu einem ISO-Datum konvertiert werden soll
+    * @param    {Boolean}   withoutTime     Gibt an, ob die Zeit genullt werden soll
+    * @return   {String}                    Konvertiertes ISO-Datum. Bei Fehler undefined.
+    */
+    convertDateToIso: function (date, withoutTime) {	
+        try {    
+            if(withoutTime)
+                return Packages.de.elo.mover.utils.ELOAsDateUtils.isoFromDateShort(date);
+            
+            return Packages.de.elo.mover.utils.ELOAsDateUtils.isoFromDate(date);            
+        }
+        catch (ex) {
+            weinrich.as.Utils.logging(true, "Fehler beim Konvertieren des Datums.\n" + ex);
+            return undefined;
+        }
+    },
+
+    /**
     * Gibt das aktuelle DateTime ohne Zeit zurück. Format bei Ausgabe: "Fri Dec 16 00:00:00 CET 2022".
     * @author   Erik Köhler - Weinrich
     * @return   {Date}                  Gibt das aktuelle Datum ohne Uhrzeit zurück. Bei Fehler undefined.
