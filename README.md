@@ -43,6 +43,14 @@ Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="
 
 # Patchnotes
 
+## Version 1.0.9 - 06.10.2023
+
+**Hinzugefügt:** weinrich.as.DateUtils.convertIsoToDate(iso, withoutTime);
+    - Konvertiert den übergebenen ISO-Datum-String in ein Date-Objekt
+
+**Hinzugefügt:** weinrich.as.DateUtils.convertDateToIso(date, withoutTime);
+    - Konvertiert das übergebene Date-Objekt zu einem ISO-Datum-String
+
 ## Version 1.0.8 - 05.10.2023
 
 **Include hinzugefügt:**  lib_sol.common.SordUtils

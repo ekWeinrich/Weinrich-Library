@@ -1969,7 +1969,7 @@ weinrich.as.DateUtils = {
     * @param    {Boolean}   withoutTime     Gibt an, ob die Zeit genullt werden soll
     * @return   {String}                    Konvertiertes ISO-Datum. Bei Fehler undefined.
     */
-    convertDateToIso: function (date, withoutTime) {	
+    convertDateToIso: function (date, withoutTime) {
         try {    
             if(withoutTime)
                 return Packages.de.elo.mover.utils.ELOAsDateUtils.isoFromDateShort(date);
@@ -2072,7 +2072,7 @@ weinrich.as.DateUtils = {
             return dateString;
         }
         catch (ex) {
-            weinrich.as.Utils.logging(true, "Fehler beim formatieren der Uhrzeit.\n" + ex);
+            weinrich.as.Utils.logging(true, "Fehler beim Formatieren der Uhrzeit.\n" + ex);
             return undefined;
         }
     },
