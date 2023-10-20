@@ -2623,7 +2623,7 @@ weinrich.as.FileUtils = {
     * Löscht eine Datei in den angegebenen Pfad.
     * @author   Erik Köhler - Weinrich
     * @memberof weinrich.as.FileUtils
-    * @method   deleteFileOrDirectory
+    * @method   deleteFile
     * @param    {File}   srcFile        Pfad auf die zu löschende Datei
     * @return   {bool}                  True wenn erfolgreich gelöscht
     * @example
@@ -2653,7 +2653,7 @@ weinrich.as.FileUtils = {
     * Löscht ein Verzeichnis rekursiv.
     * @author   Erik Köhler - Weinrich
     * @memberof weinrich.as.FileUtils
-    * @method   deleteFileOrDirectory
+    * @method   deleteDirectory
     * @param    {File}   srcDir     Pfad auf die zu löschendes Verzeichnis
     * @return   {bool}              True wenn erfolgreich gelöscht
     * @example
@@ -2740,6 +2740,8 @@ weinrich.as.DbUtils = {
     /**
     * Wendet die übergebene SELECT-Anweisung auf die ELO-Datenbank an und gibt die Einträge als Objekt zurück
     * @author   Erik Köhler - Weinrich
+    * @memberof weinrich.as.DbUtils
+    * @method   executeSelectQuery
     * @param    {String}    query       Vollständige SELECT-Anweisung
     * @param    {int}       maxRows     Maximale Anzahl an zu suchenden Treffern
     * @return   {Object[]}              Gefundene Datenbankeinträge als Array von Objekten
