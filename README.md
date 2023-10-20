@@ -11,6 +11,7 @@ Integrierte Funktionen:
 3. Funktionen für ELO
 4. Logging
 5. Filterfunktionen
+6. Datenbankanweisungen
 
 # Einbindung in eine AS-Regel
 
@@ -20,6 +21,7 @@ Damit die Bibliothek lauffähig ist, müssen folgende ELO-Bibliotheken inkludier
 - ix: IndexServer Functions
 - fu: File Utils
 - wf: Workflow Utils
+- db: DB Access
 - lib_sol.common.WfUtils
 - lib_sol.common.SordUtils
 
@@ -42,6 +44,13 @@ Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="
 übermittelt werden.
 
 # Patchnotes
+
+## Version 1.1.0 - 20.10.2023
+
+**Include hinzugefügt:**  db: DB Access
+
+**Hinzugefügt:** weinrich.as.DbUtils.executeSelectQuery(query, maxRows);
+    - Wendet die übergebene SELECT-Anweisung auf die ELO-Datenbank an und gibt ein Array mit Objekten zurück
 
 ## Version 1.0.9 - 06.10.2023
 

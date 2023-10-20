@@ -60,21 +60,21 @@ weinrich.as.Utils = {
     */
     logging: function(highPriority, text) {		
         
-        if (this.logConfig.initialized == true) {
+        if (!this.logConfig.initialized) {
+            log.info("\n\nInitialize Log-Config before logging.\n\n");    
+            return undefined;
+        }
 
-            try {
-                //Wenn hohe Priorität, dann schreibe ins Log, auch wenn Debug-Modus deaktiviert ist.
-                if (highPriority || this.logConfig.debugMode) {
-                    log.info(this.logConfig.asRuleName + text);
-                }
-            }
-            catch (ex) {
-                log.info("\n\nLogging error ...\n" + ex + "\n");
+        try {
+            //Wenn hohe Priorität, dann schreibe ins Log, auch wenn Debug-Modus deaktiviert ist.
+            if (highPriority || this.logConfig.debugMode) {
+                log.info(this.logConfig.asRuleName + text);
             }
         }
-        else {
-            log.info("\n\nInitialize Log-Config before logging.\n\n");            
+        catch (ex) {
+            log.info("\n\nLogging error ...\n" + ex + "\n");
         }
+        return undefined;
     },	
     
     /**
@@ -89,12 +89,13 @@ weinrich.as.Utils = {
     */
     arrIncludes: function (arr, value) {
         
-        if (arr) {
-            for (var i = 0; i < arr.length; i++) {
-                if (arr[i] === value)
-                    return true;
-            }
+        if (!arr) false;
+        
+        for (var i = 0; i < arr.length; i++) {
+            if (arr[i] == value)
+                return true;
         }
+
         return false;
     },
 
@@ -187,7 +188,29 @@ weinrich.as.Utils = {
             
             return -1;
         }
-  	},
+    },
+    
+    /**
+    * Ändere die Kurzbezeichnung des Sords
+    * @author   Erik Köhler - Weinrich
+    * @param    {int}       sordId      ObjId des Sords
+    * @param    {String}    shortname   Neue Kurzbezeichnung
+    * @return   {Sord}                  Gibt das geänderte Sord zurück
+    * @version added 1.1.0 
+    */
+    changeShortname: function (sordId, shortname) {
+            
+        try {    
+            var currentSord = ixConnect.ix().checkoutSord(sordId, EditInfoC.mbSord, LockC.NO).sord; 
+            currentSord.name = shortname;
+            ixConnect.ix().checkinSord(currentSord, SordC.mbAll, LockC.NO);
+            return currentSord;
+        }
+        catch (ex) {
+            this.logging(true, "Fehler beim Ändern der Kurzbezeichnung des Sords (" + sordId + ").\n" + ex);
+            return undefined;
+        }
+    },
 
     /**
     * Ändere die Maske des Sords
@@ -2700,6 +2723,43 @@ weinrich.as.WorkflowUtils = {
         catch (ex) {
             this.logging(true, "Fehler beim Laden des Workflows von " + sordId +
                 " über den Template Namen '" + wfTemplateName + "'.\n" + ex);
+            return undefined;
+        }
+    },
+};
+
+/**
+ * Funktionen für die Anbindung an die ELO-Datenbank 
+ * @memberof weinrich.as
+ * @namespace weinrich.as.DbUtils
+ * @type {object}
+ * @version release 1.0.0 
+ */
+weinrich.as.DbUtils = {
+     
+    /**
+    * Wendet die übergebene SELECT-Anweisung auf die ELO-Datenbank an und gibt die Einträge als Objekt zurück
+    * @author   Erik Köhler - Weinrich
+    * @param    {String}    query       Vollständige SELECT-Anweisung
+    * @param    {int}       maxRows     Maximale Anzahl an zu suchenden Treffern
+    * @return   {Object[]}              Gefundene Datenbankeinträge als Array von Objekten
+    * @example
+    * var query = "SELECT maskno, maskname FROM [Archiv].[dbo].[docmasks]";
+    * var rows = weinrich.as.DbUtils.executeSelectQuery(query, 10000);     
+    * for(var i = 0; i < rows.length; i++) {
+    *   var row = rows[i];
+    *   log.info("maskno=" + row["maskno"] + ", maskname=" + row["maskname"]);
+    * }
+    */
+    executeSelectQuery: function(query, maxRows) {
+
+        try {
+            var connectionId = 1;
+            var resultList = db.getMultiLine(connectionId, query, maxRows);  //Database data
+            return resultList;
+        }
+        catch(ex) {
+            log.info(logASRuleName + "Fehler beim Ausführen der SELECT-Anweisung (" + query + ")\n" + e);            
             return undefined;
         }
     },
