@@ -2492,10 +2492,10 @@ weinrich.as.FileUtils = {
         try {
             var srcDir = new File(srcPath);
 
-            if (!this.fileOrDirectoryExists(srcDir)) {
-                weinrich.as.Utils.logging(true, "ERROR loading files from path. Path (" + srcPath + ") doesn't exist...");
-                return undefined;
-            }
+            // if (!this.fileOrDirectoryExists(srcDir)) {
+            //     weinrich.as.Utils.logging(true, "ERROR loading files from path. Path (" + srcPath + ") doesn't exist...");
+            //     return undefined;
+            // }
 
             var ext = java.util.Arrays.asList(extensions);
 
