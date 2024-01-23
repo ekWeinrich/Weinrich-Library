@@ -435,7 +435,7 @@ weinrich.as.Utils = {
         //Wenn keine Maske angegeben wurde nur nach Kurzbezeichnung suchen
         if (maskname != "") {
             //Suche in bestimmter Maske...
-            findByIndex.maskId = maskname;			
+            findByIndex.maskId = maskname;
         }
         
         //...nach folgender Kurzbezeichnung
@@ -917,14 +917,33 @@ weinrich.as.Utils = {
         try {
             var sord = ixConnect.ix().checkoutSord(sordId, EditInfoC.mbAll, LockC.NO).sord;
             
+            var found = false;
+
             var objKeys = sord.objKeys;
             for (var i = 0; i < objKeys.length; i++) {
                 var key = objKeys[i];
                 if (key.name == objKeyName) {
                     key.data = [objKeyValue];
+                    found = true;
                     break;
                 }
             }
+
+            // if (!found) {
+
+            //     var defaultSordIndexing = Packages.de.elo.mover.utils.ELOAsSordUtils.getDefaultIndexing(emConnect, sord.mask);
+            //     this.logging(true, "defaultSordIndexing.objKeys.length " + defaultSordIndexing.objKeys.length);
+            //     for (var i = 0; i < defaultSordIndexing.objKeys.length; i++) {
+            //         var key = defaultSordIndexing.objKeys[i];
+            //         if (key.name == objKeyName) {
+            //             key.data = [objKeyValue];    
+            //             this.logging(true, "sord.objKeys.push(key) " + key);
+            //             sord.objKeys.push(key);
+            //             break;
+            //         }
+            //     }
+
+            // }
 
             ixConnect.ix().checkinSord(sord, SordC.mbAll, LockC.NO);
         }
@@ -2764,5 +2783,111 @@ weinrich.as.DbUtils = {
             log.info(logASRuleName + "Fehler beim Ausführen der SELECT-Anweisung (" + query + ")\n" + ex);            
             return undefined;
         }
+    },
+};
+
+/**
+ * Funktionen für die Sortierung eines Ordners in ELO 
+ * @memberof weinrich.as
+ * @namespace weinrich.as.SortUtils
+ * @type {object}
+ * @version release 1.0.0 
+ */
+weinrich.as.SortUtils = {
+     
+    /**
+    * Sortiere den Inhalt des ELO-Ordners nach Name (aufsteigend)
+    * @author   Erik Köhler - Weinrich
+    * @memberof weinrich.as.SortUtils
+    * @method   sortByNameAsc
+    * @param    {int}       sordId     ObjektId des Ordners in ELO
+    * @example
+    * var sordId = 53451;
+    * weinrich.as.SortUtils.sortByNameAsc(sordId);
+    */
+    sortByNameAsc: function(sordId) {
+        var sord = ixConnect.ix().checkoutSord(sordId, EditInfoC.mbAll, LockC.NO).sord;		
+		sord.getDetails().setSortOrder(SortOrderC.ALPHA);
+		ixConnect.ix().checkinSord(sord, SordC.mbAll, LockC.NO);
+    },
+
+    /**
+    * Sortiere den Inhalt des ELO-Ordners nach Name (absteigend)
+    * @author   Erik Köhler - Weinrich
+    * @memberof weinrich.as.SortUtils
+    * @method   sortByNameDesc
+    * @param    {int}       sordId     ObjektId des Ordners in ELO
+    * @example
+    * var sordId = 53451;
+    * weinrich.as.SortUtils.sortByNameDesc(sordId);
+    */
+    sortByNameDesc: function(sordId) {
+        var sord = ixConnect.ix().checkoutSord(sordId, EditInfoC.mbAll, LockC.NO).sord;		
+		sord.getDetails().setSortOrder(SortOrderC.IALPHA);
+		ixConnect.ix().checkinSord(sord, SordC.mbAll, LockC.NO);
+    },
+
+    /**
+    * Sortiere den Inhalt des ELO-Ordners nach internem Datum (aufsteigend)
+    * @author   Erik Köhler - Weinrich
+    * @memberof weinrich.as.SortUtils
+    * @method   sortByInternalDateAsc
+    * @param    {int}       sordId     ObjektId des Ordners in ELO
+    * @example
+    * var sordId = 53451;
+    * weinrich.as.SortUtils.sortByInternalDateAsc(sordId);
+    */
+    sortByInternalDateAsc: function(sordId) {
+        var sord = ixConnect.ix().checkoutSord(sordId, EditInfoC.mbAll, LockC.NO).sord;		
+		sord.getDetails().setSortOrder(SortOrderC.IDATE);
+		ixConnect.ix().checkinSord(sord, SordC.mbAll, LockC.NO);
+    },
+
+    /**
+    * Sortiere den Inhalt des ELO-Ordners nach internem Datum (absteigend)
+    * @author   Erik Köhler - Weinrich
+    * @memberof weinrich.as.SortUtils
+    * @method   sortByInternalDateDesc
+    * @param    {int}       sordId     ObjektId des Ordners in ELO
+    * @example
+    * var sordId = 53451;
+    * weinrich.as.SortUtils.sortByInternalDateDesc(sordId);
+    */
+    sortByInternalDateDesc: function(sordId) {
+        var sord = ixConnect.ix().checkoutSord(sordId, EditInfoC.mbAll, LockC.NO).sord;		
+		sord.getDetails().setSortOrder(SortOrderC.IIDATE);
+		ixConnect.ix().checkinSord(sord, SordC.mbAll, LockC.NO);
+    },
+
+    /**
+    * Sortiere den Inhalt des ELO-Ordners nach externem Datum (absteigend)
+    * @author   Erik Köhler - Weinrich
+    * @memberof weinrich.as.SortUtils
+    * @method   sortByExternalDateAsc
+    * @param    {int}       sordId     ObjektId des Ordners in ELO
+    * @example
+    * var sordId = 53451;
+    * weinrich.as.SortUtils.sortByExternalDateAsc(sordId);
+    */
+    sortByExternalDateAsc: function(sordId) {
+        var sord = ixConnect.ix().checkoutSord(sordId, EditInfoC.mbAll, LockC.NO).sord;		
+		sord.getDetails().setSortOrder(SortOrderC.XDATE);
+		ixConnect.ix().checkinSord(sord, SordC.mbAll, LockC.NO);
+    },
+
+    /**
+    * Sortiere den Inhalt des ELO-Ordners nach externem Datum (absteigend)
+    * @author   Erik Köhler - Weinrich
+    * @memberof weinrich.as.SortUtils
+    * @method   sortByExternalDateDesc
+    * @param    {int}       sordId     ObjektId des Ordners in ELO
+    * @example
+    * var sordId = 53451;
+    * weinrich.as.SortUtils.sortByExternalDateDesc(sordId);
+    */
+    sortByExternalDateDesc: function(sordId) {
+        var sord = ixConnect.ix().checkoutSord(sordId, EditInfoC.mbAll, LockC.NO).sord;		
+		sord.getDetails().setSortOrder(SortOrderC.IXDATE);
+		ixConnect.ix().checkinSord(sord, SordC.mbAll, LockC.NO);
     },
 };
