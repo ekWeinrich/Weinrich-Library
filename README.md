@@ -12,6 +12,7 @@ Integrierte Funktionen:
 4. Logging
 5. Filterfunktionen
 6. Datenbankanweisungen
+6. Sortierungsfunktionen
 
 # Einbindung in eine AS-Regel
 
@@ -44,6 +45,26 @@ Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="
 übermittelt werden.
 
 # Patchnotes
+
+## Version 1.1.1 - 23.01.2024
+
+**Hinzugefügt:** weinrich.as.SortUtils.sortByNameAsc(sordId);
+    - Sortiere aufsteigend nach Kurzbezeichnung
+
+**Hinzugefügt:** weinrich.as.SortUtils.sortByNameDesc(sordId);
+    - Sortiere absteigend nach Kurzbezeichnung
+
+**Hinzugefügt:** weinrich.as.SortUtils.sortByInternalDateAsc(sordId);
+    - Sortiere aufsteigend nach internem Datum
+
+**Hinzugefügt:** weinrich.as.SortUtils.sortByInternalDateDesc(sordId);
+    - Sortiere absteigend nach internem Datum
+
+**Hinzugefügt:** weinrich.as.SortUtils.sortByExternalDateAsc(sordId);
+    - Sortiere aufsteigend nach externem Datum
+
+**Hinzugefügt:** weinrich.as.SortUtils.sortByyExternalDateDesc(sordId);
+    - Sortiere absteigend nach externem Datum
 
 ## Version 1.1.0 - 20.10.2023
 
