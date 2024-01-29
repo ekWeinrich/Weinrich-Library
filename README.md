@@ -25,6 +25,7 @@ Damit die Bibliothek lauffähig ist, müssen folgende ELO-Bibliotheken inkludier
 - db: DB Access
 - lib_sol.common.WfUtils
 - lib_sol.common.SordUtils
+- lib_sol.common.RepoUtils
 
 Und natürlich die Bibliothek selber:
 
