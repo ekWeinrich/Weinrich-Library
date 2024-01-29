@@ -1109,10 +1109,8 @@ weinrich.as.Utils = {
 		if (!recursionLevel)
 			recursionLevel = -1;
 
-		var childSords = [];
 		const searchConfig = {"includeFolders":includeFolders,"includeDocuments":includeDocuments,"recursive":true,"level":recursionLevel};
-		childSords.push(sol.common.RepoUtils.findChildren(rootSordId, searchConfig));		
-		return childSords;
+		return sol.common.RepoUtils.findChildren(rootSordId, searchConfig);
 	},
 
     /**
