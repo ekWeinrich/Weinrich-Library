@@ -1093,6 +1093,29 @@ weinrich.as.Utils = {
 	},
 
     /**
+    * Lade Kind-Sords eines Eltern-Sords über dessen Id abhängig der Parameter.
+    * @author   Erik Köhler - Weinrich
+    * @param    {int}       rootSordId          Eltern-SordId für das alle Kind-Sords geladen werden sollen
+    * @param    {Boolean}   includeFolders      Gibt an, ob Ordner ausgelesen werden sollen
+    * @param    {Boolean}   includeDocuments    Gibt an, ob Dokumente ausgelesen werden sollen
+    * @param    {int}       recursionLevel      Begrenzt die Ebene der auszulesenden Unterordner. Wenn nicht angegegeben (oder -1), dann ohne Begrenzung.
+    * @return   {Sord[]}                        Alle Kind-Sords des Eltern-Sords (abhängig der Parameter)
+    * @example
+    * var sordId = 43524;        
+    * var childSords = weinrich.as.Utils.getChildSordsRecursiveById(sordId, includeFolders, includeDocuments, recursionLevel);
+    */
+    getChildSordsRecursiveById: function (rootSordId, includeFolders, includeDocuments, recursionLevel) {
+		
+		if (!recursionLevel)
+			recursionLevel = -1;
+
+		var childSords = [];
+		const searchConfig = {"includeFolders":includeFolders,"includeDocuments":includeDocuments,"recursive":true,"level":recursionLevel};
+		childSords.push(sol.common.RepoUtils.findChildren(rootSordId, searchConfig));		
+		return childSords;
+	},
+
+    /**
     * Gibt den Pfad eines Sords über seine ID zurück. Führend mit Namen des Archivs.
     * @author   Erik Köhler - Weinrich
     * @param    {int}        sordId     Sord, für das der ELO-Pfad bestimmt werden soll
@@ -1962,7 +1985,7 @@ weinrich.as.Utils = {
         }
 
         return sordArrList;
-    },
+     },    
 };
 
 /**

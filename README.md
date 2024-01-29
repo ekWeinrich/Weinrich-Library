@@ -46,6 +46,13 @@ Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="
 
 # Patchnotes
 
+## Version 1.1.2 - 29.01.2024
+
+**Include hinzugefügt:**  : lib_sol.common.RepoUtils
+
+**Hinzugefügt:** weinrich.as.Utils.getChildSordsRecursiveById(rootSordId, includeFolders, includeDocuments, recursionLevel);
+    - Lade rekursiv alle Kind-Sords über die ObjId des Ausgangsordners. Konfiguriere die zu ladenden Sords über die übergebenen Parameter.
+
 ## Version 1.1.1 - 23.01.2024
 
 **Hinzugefügt:** weinrich.as.SortUtils.sortByNameAsc(sordId);
