@@ -12,7 +12,7 @@ Integrierte Funktionen:
 4. Logging
 5. Filterfunktionen
 6. Datenbankanweisungen
-6. Sortierungsfunktionen
+7. Sortierungsfunktionen
 
 # Einbindung in eine AS-Regel
 
