@@ -1,4 +1,4 @@
-# Weinrich-Library v1.1.0
+# Weinrich-Library v1.1.2
 
 Willkommen bei der `Weinrich-Library`. Hier wird generischer Code für ELO-Projekte bereitsgestellt.
 
