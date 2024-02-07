@@ -1,4 +1,4 @@
-# Weinrich-Library v1.1.2
+# Weinrich-Library v1.1.3
 
 Willkommen bei der `Weinrich-Library`. Hier wird generischer Code für ELO-Projekte bereitsgestellt.
 
@@ -13,23 +13,25 @@ Integrierte Funktionen:
 5. Filterfunktionen
 6. Datenbankanweisungen
 7. Sortierungsfunktionen
+8. Berechtigungsfunktionen
 
 # Einbindung in eine AS-Regel
 
-Damit die Bibliothek lauffähig ist, müssen folgende ELO-Bibliotheken inkludiert werden:
+Damit die Bibliothek lauffähig ist, MÜSSEN folgende ELO-Bibliotheken inkludiert werden:
 
 - lib_Class
 - ix: IndexServer Functions
+- <a href="https://ekweinrich.github.io/Weinrich-Library/lib_weinrich.as.js.html">lib_weinrich.as</a>
+
+Um den vollen Funktionsumfang nutzen zu können, wird empfohlen folgende ELO-Bibliotheken zusätzlich zu inkludieren:
+
 - fu: File Utils
 - wf: Workflow Utils
 - db: DB Access
 - lib_sol.common.WfUtils
 - lib_sol.common.SordUtils
 - lib_sol.common.RepoUtils
-
-Und natürlich die Bibliothek selber:
-
-- <a href="https://ekweinrich.github.io/Weinrich-Library/lib_weinrich.as.js.html">lib_weinrich.as</a>
+- lib_sol.common.AclUtils
 
 # Logging
 
@@ -40,12 +42,31 @@ True/False stehen hier für Debug-Modus. Bei True wird immer ein Logeintrag gesc
 Danach kann folgendermaßen geloggt werden:
 weinrich.as.Utils.logging(false, "Dies ist ein Dummy-Logeintrag");
 True/False stehen hier für Prioritätslog. Bei True wird immer ein Logeintrag geschrieben, auch wenn man nicht im Debug-Modus ist.
- 
 
-Falls Fehler in der Library oder im Code bekannt werden, können diese <a href="https://github.com/ekWeinrich/Weinrich-Library/issues">hier</a> 
-übermittelt werden.
 
 # Patchnotes
+
+## Version 1.1.3 - 07.02.2024
+
+**Include hinzugefügt:**  : lib_sol.common.AclUtils
+
+**Hinzugefügt:** weinrich.as.Utils.addRights(sordId, users, rights, config);
+    - Füge dem Sord für die übergebenen Benutzer und/oder Gruppen Berechtigungen hinzu. 
+
+**Hinzugefügt:** weinrich.as.Utils.addRightsLong(sordId, users, read, write, del, edit, list, perm, recursive);
+    - Füge dem Sord für die übergebenen Benutzer und/oder Gruppen Berechtigungen hinzu. 
+
+**Hinzugefügt:** weinrich.as.Utils.setRights(sordId, users, rights, config);
+    - Überschreibe die bisherigen Berechtigungen mit den übergebenen Berechtigungen für die Benutzer und/oder Gruppen.
+
+**Hinzugefügt:** weinrich.as.Utils.setRights(sordId, users, read, write, del, edit, list, perm, recursive);
+    - Überschreibe die bisherigen Berechtigungen mit den übergebenen Berechtigungen für die Benutzer und/oder Gruppen.
+
+**Hinzugefügt:** weinrich.as.Utils.removeRightsLong(sordId, users, rights, config);
+    - Lösche die Berechtigungen der Benutzer und/oder Gruppen für das Sord. 
+
+**Hinzugefügt:** weinrich.as.Utils.removeRightsLong(sordId, users, read, write, del, edit, list, perm, recursive);
+    - Lösche die Berechtigungen der Benutzer und/oder Gruppen für das Sord. 
 
 ## Version 1.1.2 - 29.01.2024
 

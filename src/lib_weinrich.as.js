@@ -1534,7 +1534,7 @@ weinrich.as.Utils = {
      
     /**
     * Lade das Eltern-Sord über die ObjId eines Sords. Wird das Eltern-Sord einer Referenz gesucht, 
-    * muss zusätzlich die rootId übergeben werden, ab der 
+    * muss zusätzlich die rootId übergeben werden.
     * @author   Erik Köhler - Weinrich
     * @param    {int}    sordId     ObjId des Sords, dessen Eltern-Sord geladen werden soll
     * @param    {int}    rootId     Nur angeben wenn innerhalb eines Verzeichnisses nach dem Eltern-Sord einer REFERENZ gesucht werden soll 
@@ -1613,7 +1613,7 @@ weinrich.as.Utils = {
     
     /**
     * Lade das Eltern-Sord über die ObjId eines Sords. Wird das Eltern-Sord einer Referenz gesucht, 
-    * muss zusätzlich die rootId übergeben werden, ab der 
+    * muss zusätzlich die rootId übergeben werden.
     * @author   Erik Köhler - Weinrich
     * @param    {String}        path    Pfad des Sords, dessen Eltern-Sord geladen werden soll
     * @return   {Sord}                  Eltern-Sord, ansonsten undefined
@@ -1639,6 +1639,198 @@ weinrich.as.Utils = {
             return undefined;
         }
 	},
+
+    /**
+    * Füge dem Sord für die übergebenen Benutzer und/oder Gruppen Berechtigungen hinzu. 
+    * @author   Erik Köhler - Weinrich
+    * @param    {String}    sordId      ObjektId des anzupassenden Sords
+    * @param    {String[]}  users       Benutzer und/oder Gruppen
+    * @param    {Object}    rights      Objekt mit den Berechtigungen
+    * @param    {Object}    config      Zusätzliche Konfigurationen
+    * @version added 1.1.3
+    * @example
+    * var sordId = 56446;
+    * var users = ["Administratoren", "Administrator"];
+    * var rights = {
+    *   "r": true,
+    *   "w": true,
+    *   "d": true,
+    *   "e": true,
+    *   "l": true,
+    *   "p": true
+    * };
+    * var config = {
+    *   "recursive": true
+    * };
+    * weinrich.as.Utils.addRights(sordId, users, rights, config);
+    */
+    addRights: function (sordId, users, rights, config) {
+		sol.common.AclUtils.addRights(sordId, users, rights, config);
+	},
+
+    /**
+    * Füge dem Sord für die übergebenen Benutzer und/oder Gruppen Berechtigungen hinzu. 
+    * @author   Erik Köhler - Weinrich
+    * @param    {String}    sordId      ObjektId des anzupassenden Sords
+    * @param    {String[]}  users       Benutzer und/oder Gruppen
+    * @param    {Boolean}   read        Füge Lese-Recht hinzu
+    * @param    {Boolean}   write       Füge Schreib-Recht hinzu
+    * @param    {Boolean}   del         Füge Lösch-Recht hinzu
+    * @param    {Boolean}   edit        Füge <Bearbeiten>-Recht hinzu
+    * @param    {Boolean}   list        Füge Liste-Bearbeiten-Recht hinzu
+    * @param    {Boolean}   perm        Füge Berechtigungen-Setzen-Recht hinzu
+    * @param    {Boolean}   recursive   Vererbe die hinzugefügten Berechtigungen
+    * @version added 1.1.3
+    * @example
+    * var sordId = 56446;
+    * var users = ["Administratoren", "Administrator"];
+    * weinrich.as.Utils.addRights(sordId, users, true, true, true, true, true, true, false);
+    */
+	addRightsLong: function (sordId, users, read, write, del, edit, list, perm, recursive) {
+
+		var rights = {
+			"r": read,
+			"w": write,
+			"d": del,
+			"e": edit,
+			"l": list,
+			"p": perm,
+		};
+
+		var config = {
+			"recursive": recursive
+		};
+
+		sol.common.AclUtils.addRights(sordId, users, rights, config);
+    },
+    
+    /**
+    * Überschreibe die bisherigen Berechtigungen mit den übergebenen Berechtigungen für die Benutzer und/oder Gruppen.
+    * @author   Erik Köhler - Weinrich
+    * @param    {String}    sordId      ObjektId des anzupassenden Sords
+    * @param    {String[]}  users       Benutzer und/oder Gruppen
+    * @param    {Object}    rights      Objekt mit den zu überschreibenden Berechtigungen
+    * @param    {Object}    config      Zusätzliche Konfigurationen
+    * @version added 1.1.3
+    * @example
+    * var sordId = 56446;
+    * var users = ["Administratoren", "Administrator"];
+    * var rights = {
+    *   "r": true,
+    *   "w": true,
+    *   "d": false,
+    *   "e": false,
+    *   "l": false,
+    *   "p": false
+    * };
+    * var config = {
+    *   "recursive": true
+    * };
+    * weinrich.as.Utils.setRights(sordId, users, rights, config);
+    */
+    setRights: function (sordId, users, rights, config) {
+		sol.common.AclUtils.setRights(sordId, users, rights, config);
+	},
+
+    /**
+    * Überschreibe die bisherigen Berechtigungen mit den übergebenen Berechtigungen für die Benutzer und/oder Gruppen.
+    * @author   Erik Köhler - Weinrich
+    * @param    {String}    sordId      ObjektId des anzupassenden Sords
+    * @param    {String[]}  users       Benutzer und/oder Gruppen
+    * @param    {Boolean}   read        Füge Lese-Recht hinzu
+    * @param    {Boolean}   write       Füge Schreib-Recht hinzu
+    * @param    {Boolean}   del         Füge Lösch-Recht hinzu
+    * @param    {Boolean}   edit        Füge <Bearbeiten>-Recht hinzu
+    * @param    {Boolean}   list        Füge Liste-Bearbeiten-Recht hinzu
+    * @param    {Boolean}   perm        Füge Berechtigungen-Setzen-Recht hinzu
+    * @param    {Boolean}   recursive   Vererbe die hinzugefügten Berechtigungen
+    * @version added 1.1.3
+    * @example
+    * var sordId = 56446;
+    * var users = ["Administratoren", "Administrator"];
+    * weinrich.as.Utils.setRights(sordId, users, true, true, true, true, true, true, false);
+    */
+	setRightsLong: function (sordId, users, read, write, del, edit, list, perm, recursive) {
+
+		var rights = {
+			"r": read,
+			"w": write,
+			"d": del,
+			"e": edit,
+			"l": list,
+			"p": perm,
+		};
+
+		var config = {
+			"recursive": recursive
+		};
+
+		sol.common.AclUtils.setRights(sordId, users, rights, config);
+    },
+    
+    /**
+    * Lösche die Berechtigungen der Benutzer und/oder Gruppen für das Sord.
+    * @author   Erik Köhler - Weinrich
+    * @param    {String}    sordId      ObjektId des anzupassenden Sords
+    * @param    {String[]}  users       Benutzer und/oder Gruppen
+    * @param    {Object}    rights      Objekt mit den Berechtigungen
+    * @param    {Object}    config      Zusätzliche Konfigurationen
+    * @version added 1.1.3
+    * @example
+    * var sordId = 56446;
+    * var users = ["Administratoren", "Administrator"];
+    * var rights = {
+    *   "r": true,
+    *   "w": true,
+    *   "d": true,
+    *   "e": true,
+    *   "l": true,
+    *   "p": true
+    * };
+    * var config = {
+    *   "recursive": true
+    * };
+    * weinrich.as.Utils.removeRights(sordId, users, rights, config);
+    */
+    removeRights: function (sordId, users, rights, config) {
+		sol.common.AclUtils.removeRights(sordId, users, rights, config);
+	},
+
+    /**
+    * Lösche die Berechtigungen der Benutzer und/oder Gruppen für das Sord. 
+    * @author   Erik Köhler - Weinrich
+    * @param    {String}    sordId      ObjektId des anzupassenden Sords
+    * @param    {String[]}  users       Benutzer und/oder Gruppen
+    * @param    {Boolean}   read        Füge Lese-Recht hinzu
+    * @param    {Boolean}   write       Füge Schreib-Recht hinzu
+    * @param    {Boolean}   del         Füge Lösch-Recht hinzu
+    * @param    {Boolean}   edit        Füge <Bearbeiten>-Recht hinzu
+    * @param    {Boolean}   list        Füge Liste-Bearbeiten-Recht hinzu
+    * @param    {Boolean}   perm        Füge Berechtigungen-Setzen-Recht hinzu
+    * @param    {Boolean}   recursive   Vererbe die hinzugefügten Berechtigungen
+    * @version added 1.1.3
+    * @example
+    * var sordId = 56446;
+    * var users = ["Administratoren", "Administrator"];
+    * weinrich.as.Utils.removeRights(sordId, users, true, true, true, true, true, true, false);
+    */
+	removeRightsLong: function (sordId, users, read, write, del, edit, list, perm, recursive) {
+
+		var rights = {
+			"r": read,
+			"w": write,
+			"d": del,
+			"e": edit,
+			"l": list,
+			"p": perm,
+		};
+
+		var config = {
+			"recursive": recursive
+		};
+
+		sol.common.AclUtils.removeRights(sordId, users, rights, config);
+    },
     
     // # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 };
