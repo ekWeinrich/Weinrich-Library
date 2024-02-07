@@ -50,7 +50,7 @@ True/False stehen hier für Prioritätslog. Bei True wird immer ein Logeintrag g
 
 **Include hinzugefügt:**  : lib_sol.common.AclUtils
 
-**Hinzugefügt:** weinrich.as.Utils.addRights(sordId, users, rights, config);
+**Hinzugefügt:** weinrich.as.Utils.addRights(sordId, users, rights, config);</br>
     - Füge dem Sord für die übergebenen Benutzer und/oder Gruppen Berechtigungen hinzu. 
 
 **Hinzugefügt:** weinrich.as.Utils.addRightsLong(sordId, users, read, write, del, edit, list, perm, recursive);
