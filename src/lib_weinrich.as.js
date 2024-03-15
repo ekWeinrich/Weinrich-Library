@@ -867,7 +867,7 @@ weinrich.as.Utils = {
     /**
     * Setze Indexfeldwerte eines Sords über ein Objekt mit Indexfeldname zu Wert Zuordnungen.
     * @author   Erik Köhler - Weinrich
-    * @param    {Sord}      sord        Sord, für den der Wert des Indexfelds gesetzt werden soll
+    * @param    {int}      sordId                SordId, für den der Wert des Indexfelds gesetzt werden soll
     * @param    {Object}    objKeysObj  Name des Indexfeldes
     * @example
     * var sordId = 43544;
@@ -903,7 +903,7 @@ weinrich.as.Utils = {
     /**
     * Setze den Indexfeldwert eines Sords über den Namen des Indexfeldes.
     * @author   Erik Köhler - Weinrich
-    * @param    {Sord}      sord                Sord, für den der Wert des Indexfelds gesetzt werden soll
+    * @param    {int}      sordId                SordId, für den der Wert des Indexfelds gesetzt werden soll
     * @param    {String}    indexfieldName      Name des Indexfeldes
     * @param    {String}    indexfieldValue     Zu setzender Wert des Indexfeldes
     * @example
