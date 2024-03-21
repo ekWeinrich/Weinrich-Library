@@ -2993,7 +2993,7 @@ weinrich.as.DbUtils = {
             return resultList;
         }
         catch(ex) {
-            log.info(logASRuleName + "Fehler beim Ausführen der SELECT-Anweisung (" + query + ")\n" + ex);            
+            weinrich.as.Utils.logging(true, "Fehler beim Ausführen der SELECT-Anweisung (" + query + ")\n" + ex);   
             return undefined;
         }
     },
