@@ -1025,7 +1025,7 @@ weinrich.as.Utils = {
 	},
 
     /**
-    * Lade alle Kind-Sords eines Eltern-Sords über dessen Pfad.
+    * Lade alle Kind-Sords eines Eltern-Sords über dessen Pfad. (ACHTUNG: Ab Version 1.1.4 wurde behoben, dass man die Sords auf gleicher Ebene als Rückgabewert zurückbekommen hat)
     * @author   Erik Köhler - Weinrich
     * @param    {String}                        path    ELO-Pfad des Sords
     * @return   {java.util.ArrayList<Sord>}             Alle Kind-Sords des Eltern-Sords
@@ -1034,13 +1034,27 @@ weinrich.as.Utils = {
     * var path = weinrich.as.Utils.getArcPathById(sordId);
     * var childSords = weinrich.as.Utils.getChildSordsByPath(path);
     */
-    getChildSordsByPath: function (path) {	
+    getChildSordsByPath: function (path) {	 
             
         try {
             var sord = this.getSordByArcpath(path);
             if (sord === undefined) throw "Error loading Sord...";
 
-            return Packages.de.elo.mover.utils.ELOAsSordUtils.getChildren(emConnect, sord.parentId);
+            // var preventFailureOldVersion = false;
+            return Packages.de.elo.mover.utils.ELOAsSordUtils.getChildren(emConnect, sord.id);
+
+            // for (var i = 0; i < childSords.length(); i++){
+            //     if (childSords[i].id == sord.id) {
+            //         preventFailureOldVersion = true;
+            //         break;
+            //     }
+            // }
+
+            // if (preventFailureOldVersion)
+            //     childSords = Packages.de.elo.mover.utils.ELOAsSordUtils.getChildren(emConnect, sord.id);
+
+            // return childSords;
+            
         }
         catch (ex) {
             this.logging(true, "Fehler beim Laden aller Kind-Sords von  " + path + ".\n" + ex);
