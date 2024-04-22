@@ -1040,21 +1040,7 @@ weinrich.as.Utils = {
             var sord = this.getSordByArcpath(path);
             if (sord === undefined) throw "Error loading Sord...";
 
-            // var preventFailureOldVersion = false;
             return Packages.de.elo.mover.utils.ELOAsSordUtils.getChildren(emConnect, sord.id);
-
-            // for (var i = 0; i < childSords.length(); i++){
-            //     if (childSords[i].id == sord.id) {
-            //         preventFailureOldVersion = true;
-            //         break;
-            //     }
-            // }
-
-            // if (preventFailureOldVersion)
-            //     childSords = Packages.de.elo.mover.utils.ELOAsSordUtils.getChildren(emConnect, sord.id);
-
-            // return childSords;
-            
         }
         catch (ex) {
             this.logging(true, "Fehler beim Laden aller Kind-Sords von  " + path + ".\n" + ex);
