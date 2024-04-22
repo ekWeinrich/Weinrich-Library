@@ -12,7 +12,7 @@ weinrich.as = {};
  * @memberof weinrich.as
  * @namespace weinrich.as.Utils
  * @type {object}
- * @version release 1.1.2
+ * @version release 1.1.4
  * - {@link https://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html ArrayList}
  */
 weinrich.as.Utils = {
@@ -1025,7 +1025,7 @@ weinrich.as.Utils = {
 	},
 
     /**
-    * Lade alle Kind-Sords eines Eltern-Sords über dessen Pfad. (ACHTUNG: Ab Version 1.1.4 wurde behoben, dass man die Sords auf gleicher Ebene als Rückgabewert zurückbekommen hat)
+    * Lade alle Kind-Sords eines Eltern-Sords über dessen Pfad. (ACHTUNG: Bugfix siehe Version 1.1.4)
     * @author   Erik Köhler - Weinrich
     * @param    {String}                        path    ELO-Pfad des Sords
     * @return   {java.util.ArrayList<Sord>}             Alle Kind-Sords des Eltern-Sords

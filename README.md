@@ -46,6 +46,11 @@ True/False stehen hier für Prioritätslog. Bei True wird immer ein Logeintrag g
 
 # Patchnotes
 
+## Version 1.1.4 - 22.04.2024
+
+**Angepasst:** weinrich.as.Utils.getChildSordsByPath 
+    - Bugfix: Bis Version 1.1.3 hat die Funktion die Sords auf gleicher Ebene, wie das Sord im Pfad zurückgegeben. Ab 1.1.4 bekommt man korrekterweise die Kind-Sords vom Sord des     überbenenen Pfads.
+
 ## Version 1.1.3 - 07.02.2024
 
 **Include hinzugefügt:**  : lib_sol.common.AclUtils
