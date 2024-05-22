@@ -1,4 +1,4 @@
-# Weinrich-Library v1.1.4
+# Weinrich-Library v1.1.5
 
 Willkommen bei der `Weinrich-Library`. Hier wird generischer Code für ELO-Projekte bereitsgestellt.
 
@@ -45,6 +45,11 @@ True/False stehen hier für Prioritätslog. Bei True wird immer ein Logeintrag g
 
 
 # Patchnotes
+
+## Version 1.1.5 - 22.05.2024
+
+**Angepasst:** weinrich.as.FileUtils.getFilesFromDirectory(srcPath, extensions, recursive)
+    - Gibt man ein leeres Array in extensions an, wird nicht nach Dateiendung gefiltert
 
 ## Version 1.1.4 - 22.04.2024
 
