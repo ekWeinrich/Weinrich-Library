@@ -2733,7 +2733,7 @@ weinrich.as.FileUtils = {
 
             var files = FileUtils.convertFileCollectionToFileArray(FileUtils.listFiles(
                 srcDir,
-                extensions ? new SuffixFileFilter(ext, IOCase.INSENSITIVE) : TrueFileFilter.INSTANCE,
+                extensions && extensions.length>0 ? new SuffixFileFilter(ext, IOCase.INSENSITIVE) : TrueFileFilter.INSTANCE,
                 recursive ? TrueFileFilter.INSTANCE : FalseFileFilter.INSTANCE)
             );
     
